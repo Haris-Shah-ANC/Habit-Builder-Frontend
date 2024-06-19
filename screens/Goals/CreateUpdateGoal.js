@@ -1,10 +1,17 @@
 import * as React from 'react';
-import { Text, View, Button } from "react-native";
+import { View } from 'react-native';
+import { TextInput } from 'react-native-paper';
 
 const CreateUpdateGoal = () => {
+    const [text, setText] = React.useState("");
+
     return (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <Text>Create/Update Goals</Text>
+        <View style={{paddingTop : 10}}>
+            <TextInput
+                label="Email"
+                value={text}
+                onChangeText={text => setText(text)}
+            />
         </View>
     )
 }

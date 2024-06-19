@@ -22,6 +22,10 @@ const HomePage = ({ route, navigation }) => {
         })
     })
 
+    React.useEffect (() => {
+        
+    })
+
     return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <Text>Home Screen</Text>

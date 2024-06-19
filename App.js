@@ -1,10 +1,12 @@
 import React from 'react';
 import DrawerNavigator from './navigation/AppNavigator';
-import HomePage from './screens/HomePage';
-
+import { PaperProvider } from 'react-native-paper';
+import theme from './utilities/theme';
 
 export default function App() {
   return (
-    <DrawerNavigator />
+    <PaperProvider theme={theme}>
+      <DrawerNavigator />
+    </PaperProvider>
   );
 }

@@ -7,10 +7,11 @@ import CreateUpdateGoal from '../screens/Goals/CreateUpdateGoal';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import Login from '../screens/Authentication/Login';
 import Signup from '../screens/Authentication/Signup';
+import { customTheme } from '../utilities/theme';
 
 const defaultNavOptions = {
   headerStyle: {
-    backgroundColor: '#f4511e',
+    backgroundColor: customTheme.colors.primary,
   },
   headerTitleStyle: {
     marginLeft: -10,
@@ -30,7 +31,6 @@ export const AppNavigator = () => {
       <Stack.Screen name="Add Goal" component={CreateUpdateGoal} />
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Signup" component={Signup} />
-
     </Stack.Navigator>
   );
 };
