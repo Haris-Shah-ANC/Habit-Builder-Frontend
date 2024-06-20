@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, ScrollView } from 'react-native';
-import { Button, Menu, Provider, TextInput as PaperTextInput, Title, Card, IconButton, DropDown } from 'react-native-paper';
+import { Button, Menu, Provider, TextInput as PaperTextInput, Title, Card, IconButton, DropDown, Divider } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { GestureHandlerRootView, NativeViewGestureHandler } from 'react-native-gesture-handler';
+import { createGoal } from '../../NetworkCalls/networkCalls';
 
 const CreateUpdateGoal = () => {
-    const [listName, setListName] = useState('');
+    const [goalName, setGoalName] = useState('');
     const [fromDate, setFromDate] = useState(new Date());
     const [toDate, setToDate] = useState(new Date());
     const [showFromDatePicker, setShowFromDatePicker] = useState(false);
     const [showToDatePicker, setShowToDatePicker] = useState(false);
     const [task, setTask] = useState('');
+    const [countOfTask, setCountOfTask] = useState(0);
     const [unit, setUnit] = useState('');
     const [units, setUnits] = useState(['kms', 'hours', 'nos']);
     const [tasks, setTasks] = useState([]);
@@ -19,13 +21,37 @@ const CreateUpdateGoal = () => {
     const [newUnit, setNewUnit] = useState('');
 
     const addTask = () => {
-        setTasks([...tasks, { task, unit }]);
-        setTask('');
-        setUnit('');
+        if (task) {
+            setTasks([...tasks, { "taskname": task, "system_defined_unit": unit, "times": countOfTask }]);
+            setTask('');
+            setUnit('');
+            setCountOfTask(0);
+        }
+        else {
+            alert("Please Add Task")
+        }
     };
 
-    const saveList = () => {
-        console.log({ listName, fromDate, toDate, tasks });
+    const onSave = () => {
+        let startdate = fromDate.toISOString().split('T')[0]
+        let enddate = toDate.toISOString().split('T')[0]
+        let payloadData = {
+            topicname: goalName,
+            startdate: startdate,
+            enddate: enddate,
+            tasks: tasks
+        }
+        console.log("payloadData", payloadData);
+        console.log({ goalName, fromDate, toDate, tasks, countOfTask });
+
+        createGoal(payloadData)
+            .then((res) => {
+                let result = res
+            })
+            .catch((err) => {
+                console.log("Error while creating Goal", err)
+            })
+
     };
 
     const addNewUnit = () => {
@@ -53,8 +79,8 @@ const CreateUpdateGoal = () => {
                                         <Text style={styles.label}>Goal:</Text>
                                         <PaperTextInput
                                             style={styles.input}
-                                            value={listName}
-                                            onChangeText={setListName}
+                                            value={goalName}
+                                            onChangeText={setGoalName}
                                             placeholder="your goal here..."
                                             mode="outlined"
                                         />
@@ -100,6 +126,7 @@ const CreateUpdateGoal = () => {
                                                 }}
                                             />
                                         )}
+                                        <Divider />
                                         <Text style={styles.label}>Task</Text>
                                         <PaperTextInput
                                             style={styles.input}
@@ -107,6 +134,16 @@ const CreateUpdateGoal = () => {
                                             onChangeText={setTask}
                                             placeholder="Enter task name.."
                                             mode="outlined"
+                                        />
+
+                                        <Text style={styles.label}>Count of Task:</Text>
+                                        <PaperTextInput
+                                            style={styles.input}
+                                            value={countOfTask}
+                                            onChangeText={setCountOfTask}
+                                            placeholder="enter task count.."
+                                            mode="outlined"
+                                            keyboardType='numeric'
                                         />
                                         <Text style={styles.label}>Unit</Text>
                                         {!addingNewUnit && (
@@ -144,6 +181,8 @@ const CreateUpdateGoal = () => {
                                                 </Button>
                                             </View>
                                         )}
+
+
                                         <Button mode="contained" onPress={addTask} style={styles.addButton}>
                                             Add Task
                                         </Button>
@@ -151,8 +190,9 @@ const CreateUpdateGoal = () => {
                                             data={tasks}
                                             renderItem={({ item }) => (
                                                 <View style={styles.taskContainer}>
-                                                    <Text>{item.task}</Text>
-                                                    <Text>{item.unit}</Text>
+                                                    <Text>{item.taskname}</Text>
+                                                    <Text>{item.times}</Text>
+                                                    <Text>{item.system_defined_unit}</Text>
                                                     <IconButton icon="delete" onPress={() => {
                                                         const newTasks = tasks.filter(taskItem => taskItem !== item);
                                                         setTasks(newTasks);
@@ -163,7 +203,7 @@ const CreateUpdateGoal = () => {
                                         />
                                     </Card.Content>
                                 </Card>
-                                <Button mode="contained" onPress={saveList} style={styles.saveButton}>
+                                <Button mode="contained" onPress={onSave} style={styles.saveButton}>
                                     Save List
                                 </Button>
                             </ScrollView>
@@ -191,6 +231,7 @@ const styles = StyleSheet.create({
     card: {
         padding: 10,
         marginBottom: 20,
+        backgroundColor: "white"
     },
     label: {
         fontSize: 16,
@@ -228,7 +269,6 @@ const styles = StyleSheet.create({
     saveButton: {
         marginTop: 20,
     },
-  
 });
 
 export default CreateUpdateGoal;

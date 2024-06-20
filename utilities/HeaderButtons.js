@@ -2,10 +2,6 @@ import { Ionicons } from '@expo/vector-icons';
 import {
     HeaderButton,
     Item,
-    OverflowMenu,
-    overflowMenuPressHandlerPopupMenu,
-    overflowMenuPressHandlerActionSheet,
-    HiddenItem,
 } from "react-navigation-header-buttons";
 
 const CustomHeaderButton = (props) => {
