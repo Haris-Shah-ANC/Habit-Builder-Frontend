@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, ScrollView, Alert } from 'react-native';
 import { Button, Menu, Provider, TextInput as PaperTextInput, Title, Card, IconButton, DropDown, Divider } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { GestureHandlerRootView, NativeViewGestureHandler } from 'react-native-gesture-handler';
 import { createGoal } from '../../NetworkCalls/networkCalls';
+import { RedStar } from '../../utilities/utils';
 
-const CreateUpdateGoal = () => {
+const CreateUpdateGoal = ({ navigation }) => {
     const [goalName, setGoalName] = useState('');
     const [fromDate, setFromDate] = useState(new Date());
     const [toDate, setToDate] = useState(new Date());
@@ -22,7 +23,7 @@ const CreateUpdateGoal = () => {
 
     const addTask = () => {
         if (task) {
-            setTasks([...tasks, { "taskname": task, "system_defined_unit": unit, "times": countOfTask }]);
+            setTasks([...tasks, { "taskname": task, "system_defined_unit": unit, "times": countOfTask, "user_defined_unit": null }]);
             setTask('');
             setUnit('');
             setCountOfTask(0);
@@ -33,6 +34,10 @@ const CreateUpdateGoal = () => {
     };
 
     const onSave = () => {
+        if (!goalName && !startdate && !enddate) {
+            alert("Please Fill the required details")
+            return
+        }
         let startdate = fromDate.toISOString().split('T')[0]
         let enddate = toDate.toISOString().split('T')[0]
         let payloadData = {
@@ -41,15 +46,24 @@ const CreateUpdateGoal = () => {
             enddate: enddate,
             tasks: tasks
         }
-        console.log("payloadData", payloadData);
-        console.log({ goalName, fromDate, toDate, tasks, countOfTask });
+        // console.log("payloadData", payloadData);
+        // console.log({ goalName, fromDate, toDate, tasks, countOfTask });
 
         createGoal(payloadData)
             .then((res) => {
-                let result = res
+                let result = res.data
+                if (result.success) {
+                    Alert.alert("Success", `${result.status}`, [
+                        {
+                            text: "OK",
+                            onPress: () => { },
+                        }
+                    ]);
+                }
+                navigation.navigate("All Goals");
             })
             .catch((err) => {
-                console.log("Error while creating Goal", err)
+                console.log("Error while creating Goal", err);
             })
 
     };
@@ -68,15 +82,17 @@ const CreateUpdateGoal = () => {
         <Provider>
             <GestureHandlerRootView style={{ flex: 1 }}>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                    <KeyboardAvoidingView
-                        style={styles.container}
-                    >
+                    <KeyboardAvoidingView style={styles.container}>
                         <NativeViewGestureHandler>
-                            <ScrollView contentContainerStyle={styles.scrollContainer}>
+                            <ScrollView
+                                contentContainerStyle={styles.scrollContainer}
+                                showsHorizontalScrollIndicator={false}
+                                showsVerticalScrollIndicator={false}
+                            >
                                 {/* <Title style={styles.header}>New List</Title> */}
                                 <Card style={styles.card}>
                                     <Card.Content>
-                                        <Text style={styles.label}>Goal:</Text>
+                                        <Text style={styles.label}>Goal: {<RedStar />}</Text>
                                         <PaperTextInput
                                             style={styles.input}
                                             value={goalName}
@@ -84,7 +100,7 @@ const CreateUpdateGoal = () => {
                                             placeholder="your goal here..."
                                             mode="outlined"
                                         />
-                                        <Text style={styles.label}>From</Text>
+                                        <Text style={styles.label}>From: {<RedStar />}</Text>
                                         <Button
                                             mode="outlined"
                                             onPress={() => setShowFromDatePicker(true)}
@@ -105,7 +121,7 @@ const CreateUpdateGoal = () => {
                                                 }}
                                             />
                                         )}
-                                        <Text style={styles.label}>To</Text>
+                                        <Text style={styles.label}>To: {<RedStar />}</Text>
                                         <Button
                                             mode="outlined"
                                             onPress={() => setShowToDatePicker(true)}
@@ -183,7 +199,7 @@ const CreateUpdateGoal = () => {
                                         )}
 
 
-                                        <Button mode="contained" onPress={addTask} style={styles.addButton}>
+                                        <Button mode="contained-tonal" onPress={addTask} style={styles.addButton}>
                                             Add Task
                                         </Button>
                                         <FlatList
