@@ -1,15 +1,23 @@
 import { useState } from "react";
-import { Alert, KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from "react-native"
+import { Alert, KeyboardAvoidingView, ScrollView, StyleSheet, Text } from "react-native"
 import { Provider, TextInput as PaperTextInput, Button, Card } from "react-native-paper";
 import { signUpUser } from "./authNetworkCalls";
+import { fillLoginDetails, setLoginStatus, setToken, setUserEmail, setUsername } from "../../config/storageCOnfig,";
 
 
-const Signup = () => {
+const Signup = (props) => {
 
     let [name, setName] = useState("");
     let [email, setEmail] = useState("");
     let [password, setPassword] = useState("");
     let [confirmPassword, setConfirmPassword] = useState("");
+
+    const clearFormData = () => {
+        setName("");
+        setEmail("");
+        setPassword("");
+        setConfirmPassword("");
+    }
 
     const onSubmitHandler = () => {
         payloadData = {
@@ -19,6 +27,7 @@ const Signup = () => {
         }
         signUpUser(payloadData)
             .then((res) => {
+                console.log("res", res.data)
                 if (res.data.success !== true) {
                     Alert.alert("SignUp Failed", res.data.status ? res.data.status : "Please try again", [
                         {
@@ -26,14 +35,34 @@ const Signup = () => {
                             onPress: () => { },
                         },
                     ]);
-                    //reset form
-                    // disable loader if required
+                    //reset all data
+                    // clearFormData();
+                    // disable loader 
                 } else {
                     console.log("Successfully Signed Up!");
-                    // 
+
+                    setToken(res.data.data.access);
+                    setLoginStatus("true");
+                    setUsername(res.data.data.name);
+                    setUserEmail(res.data.data.email);
+                    // setUserId(res.data);
+                    fillLoginDetails();
+                    // clearFormData();
+                    props.navigation.navigate('All Goals');
                 }
             })
-    }
+            .catch((err) => {
+                Alert.alert("SignUp Failed", "Please try again", [
+                    {
+                        text: "OK",
+                        onPress: () => { },
+                    },
+                ]);
+                // reset all fields
+                // clearFormData();
+                console.log("Error while Signup", err)
+            });
+    };
 
     return (
         <Provider>
@@ -112,7 +141,8 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     btnSingup: {
-        margin: 15
+        margin: 15,
+        borderRadius: 5,
     },
     card: {
         backgroundColor: "white"

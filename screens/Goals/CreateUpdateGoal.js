@@ -102,7 +102,7 @@ const CreateUpdateGoal = ({ navigation }) => {
                                         />
                                         <Text style={styles.label}>From: {<RedStar />}</Text>
                                         <Button
-                                            mode="outlined"
+                                            mode="contained"
                                             onPress={() => setShowFromDatePicker(true)}
                                             icon="calendar"
                                             style={styles.dateButton}
@@ -123,7 +123,7 @@ const CreateUpdateGoal = ({ navigation }) => {
                                         )}
                                         <Text style={styles.label}>To: {<RedStar />}</Text>
                                         <Button
-                                            mode="outlined"
+                                            mode="contained"
                                             onPress={() => setShowToDatePicker(true)}
                                             icon="calendar"
                                             style={styles.dateButton}
@@ -258,10 +258,12 @@ const styles = StyleSheet.create({
     },
     dateButton: {
         marginBottom: 20,
+        borderRadius: 5,
     },
     unitButton: {
         justifyContent: 'space-between',
         marginBottom: 20,
+        borderRadius: 5,
     },
     newUnitContainer: {
         flexDirection: 'row',

@@ -12,3 +12,15 @@ export const signUpUser = (userData) => {
             })
     })
 }
+
+export const loginUser = (userData) => {
+    return new Promise((resolve, reject) => {
+        axios.post(`${HOST}/login/`, userData)
+            .then((res) => {
+                resolve(res);
+            })
+            .catch((err) => {
+                reject(err);
+            })
+    })
+}

@@ -40,7 +40,7 @@ const Drawer = createDrawerNavigator();
 const DrawerNavigator = () => {
   return (
     <NavigationContainer>
-      <Drawer.Navigator initialRouteName="Home" screenOptions={defaultNavOptions}>
+      <Drawer.Navigator initialRouteName="Login" screenOptions={defaultNavOptions}>
         <Drawer.Screen name="Home" component={AppNavigator} />
         <Drawer.Screen name="Login" component={Login} />
         <Drawer.Screen name="Signup" component={Signup} />
