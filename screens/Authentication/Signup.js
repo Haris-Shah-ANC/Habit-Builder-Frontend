@@ -21,9 +21,10 @@ const Signup = (props) => {
 
     const onSubmitHandler = () => {
         payloadData = {
-            name: name,
+            username: name,
             email: email,
-            password: password
+            password1: password,
+            password2: confirmPassword
         }
         signUpUser(payloadData)
             .then((res) => {

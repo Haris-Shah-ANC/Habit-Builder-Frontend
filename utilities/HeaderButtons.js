@@ -25,12 +25,22 @@ export const AddNewGoalButton = (props) => {
     )
 }
 
-export const GoogleLogo = (props) => {
+export const GoogleLogo = () => {
     return (
         <Ionicons
             name='logo-google'
             color='white'
             size={30}
+        />
+    )
+}
+
+export const DeleteLogo = () => {
+    return (
+        <Ionicons
+            name='trash-bin'
+            color='black'
+            size={20}
         />
     )
 }
