@@ -8,8 +8,8 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import Login from '../screens/Authentication/Login';
 import Signup from '../screens/Authentication/Signup';
 import { customTheme } from '../utilities/theme';
-import { getLoginStatus } from '../config/storageCOnfig,';
-import IndividualGoal from '../screens/Goals/IndividualGoal';
+import { getLoginStatus, getToken } from '../config/storageCOnfig,';
+import IndividualGoal, { IndividualGoalScreenOptions } from '../screens/Goals/IndividualGoal';
 import { fetchToken } from '../utilities/utils';
 
 const defaultNavOptions = {
@@ -28,10 +28,10 @@ const Stack = createNativeStackNavigator();
 
 export const AppNavigator = () => {
 
-  const [loginStatus, setLoginStatus] = React.useState(false);
+  const [loginStatus, setLoginStatus] = React.useState(null);
 
   const checkLoginStatus = async () => {
-    const isLoggedIn = await getLoginStatus();
+    const isLoggedIn = await getToken();
     console.log("loginStatus", isLoggedIn);
     setLoginStatus(isLoggedIn)
   }
@@ -39,6 +39,7 @@ export const AppNavigator = () => {
   React.useEffect(() => {
     checkLoginStatus()
   }, [])
+  console.log("loginStatus", loginStatus);
 
   return (
     <Stack.Navigator >

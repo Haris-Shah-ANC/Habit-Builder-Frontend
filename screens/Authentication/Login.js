@@ -24,13 +24,14 @@ const Login = (props) => {
 
     const onSubmitHandler = () => {
         payloadData = {
+            username: email,
             email: email,
             password: password
         }
         loginUser(payloadData)
             .then(async (res) => {
-                console.log("res", res.data)
-                if (res.data.success !== true) {
+                console.log("res", res.data.access)
+                if (!res.data.access) {
                     Alert.alert("Login Failed", res.data.status ? res.data.status : "Please try again", [
                         {
                             text: "OK",

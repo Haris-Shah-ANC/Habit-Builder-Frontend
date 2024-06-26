@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { View, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
 import CustomHeaderButton, { AddNewGoalButton, DeleteLogo } from '../utilities/HeaderButtons';
 import { getLoginStatus } from '../config/storageCOnfig,';
 import Login from './Authentication/Login';
 import { Avatar, Button, Card, Text } from 'react-native-paper';
-import { fetchAllGoals } from '../NetworkCalls/networkCalls';
+import { deleteSpecificGoal, fetchAllGoals } from '../NetworkCalls/networkCalls';
 import { ScrollView } from 'react-native-virtualized-view';
 import moment from 'moment/moment';
 
@@ -15,205 +15,7 @@ const HomePage = ({ route, navigation }) => {
     const [loginStatus, setLoginStatus] = React.useState(null);
 
     const [goalsList, setGoalsList] = React.useState(
-        {
-            "success": true,
-            "data":
-            {
-                "userdata": {
-                    "id": 2,
-                    "last_login": "2024-06-21T11:11:13.977581Z",
-                    "email": "anshul2@gmail.com",
-                    "name": null,
-                    "first_name": null,
-                    "last_name": null,
-                    "date_of_birth": null,
-                    "city": null,
-                    "units": [
-                        "number",
-                        "min/hour"
-                    ]
-                },
-                "topics": [
-                    {
-                        "id": 18,
-                        "user_id_id": 2,
-                        "topic_name": "Healthy Diet abc",
-                        "start_date": "2024-06-01",
-                        "end_date": "2025-12-15",
-                        "duration_days": 562,
-                        "created_at": "2024-06-20T14:29:02.294517Z",
-                        "modified_at": "2024-06-20T14:29:02.307501Z",
-                        "tasks": [
-                            {
-                                "id": 26,
-                                "taskname": "Bhakri",
-                                "topic_id_id": 18,
-                                "user_id_id": 2,
-                                "times": 3.0,
-                                "system_defined_unit": "number",
-                                "user_defined_unit": null,
-                                "completed_times": null,
-                                "created_at": "2024-06-20T14:29:02.311800Z",
-                                "modified_at": "2024-06-20T14:29:02.314290Z"
-                            },
-                            {
-                                "id": 27,
-                                "taskname": "Guavas",
-                                "topic_id_id": 18,
-                                "user_id_id": 2,
-                                "times": 30.0,
-                                "system_defined_unit": null,
-                                "user_defined_unit": "number",
-                                "completed_times": null,
-                                "created_at": "2024-06-20T14:29:02.317165Z",
-                                "modified_at": "2024-06-20T14:29:02.319529Z"
-                            },
-                            {
-                                "id": 28,
-                                "taskname": "Bhakri",
-                                "topic_id_id": 18,
-                                "user_id_id": 2,
-                                "times": 3.0,
-                                "system_defined_unit": "nos",
-                                "user_defined_unit": null,
-                                "completed_times": null,
-                                "created_at": "2024-06-21T06:16:00.086642Z",
-                                "modified_at": "2024-06-21T06:16:00.089742Z"
-                            }
-                        ]
-                    },
-                    {
-                        "id": 19,
-                        "user_id_id": 2,
-                        "topic_name": "Healthy Diet abc",
-                        "start_date": "2024-06-01",
-                        "end_date": "2025-12-15",
-                        "duration_days": 562,
-                        "created_at": "2024-06-21T06:16:00.076717Z",
-                        "modified_at": "2024-06-21T06:16:00.080252Z",
-                        "tasks": []
-                    },
-                    {
-                        "id": 20,
-                        "user_id_id": 2,
-                        "topic_name": "Healthy Diet",
-                        "start_date": "2024-06-01",
-                        "end_date": "2024-07-15",
-                        "duration_days": 44,
-                        "created_at": "2024-06-21T06:33:17.078534Z",
-                        "modified_at": "2024-06-21T06:33:17.081524Z",
-                        "tasks": [
-                            {
-                                "id": 30,
-                                "taskname": "Eating Rice",
-                                "topic_id_id": 20,
-                                "user_id_id": 2,
-                                "times": 15.0,
-                                "system_defined_unit": "nos",
-                                "user_defined_unit": null,
-                                "completed_times": null,
-                                "created_at": "2024-06-21T06:33:17.088455Z",
-                                "modified_at": "2024-06-21T06:33:17.092117Z"
-                            },
-                            {
-                                "id": 31,
-                                "taskname": "Apples",
-                                "topic_id_id": 20,
-                                "user_id_id": 2,
-                                "times": 30.0,
-                                "system_defined_unit": null,
-                                "user_defined_unit": "number",
-                                "completed_times": null,
-                                "created_at": "2024-06-21T06:33:17.095663Z",
-                                "modified_at": "2024-06-21T06:33:17.097943Z"
-                            }
-                        ]
-                    },
-                    {
-                        "id": 21,
-                        "user_id_id": 2,
-                        "topic_name": "Healthy Diet",
-                        "start_date": "2024-06-01",
-                        "end_date": "2024-07-15",
-                        "duration_days": 44,
-                        "created_at": "2024-06-21T06:37:10.378271Z",
-                        "modified_at": "2024-06-21T06:37:10.390962Z",
-                        "tasks": []
-                    },
-                    {
-                        "id": 24,
-                        "user_id_id": 2,
-                        "topic_name": "Get Healthy",
-                        "start_date": "2024-06-21",
-                        "end_date": "2024-07-31",
-                        "duration_days": 40,
-                        "created_at": "2024-06-21T06:58:38.680218Z",
-                        "modified_at": "2024-06-21T06:58:38.692541Z",
-                        "tasks": [
-                            {
-                                "id": 38,
-                                "taskname": "Eat Apples",
-                                "topic_id_id": 24,
-                                "user_id_id": 2,
-                                "times": 10.0,
-                                "system_defined_unit": "nos",
-                                "user_defined_unit": null,
-                                "completed_times": null,
-                                "created_at": "2024-06-21T06:58:38.698787Z",
-                                "modified_at": "2024-06-21T06:58:38.701817Z"
-                            },
-                            {
-                                "id": 39,
-                                "taskname": "Running",
-                                "topic_id_id": 24,
-                                "user_id_id": 2,
-                                "times": 10.0,
-                                "system_defined_unit": "kms",
-                                "user_defined_unit": null,
-                                "completed_times": null,
-                                "created_at": "2024-06-21T06:58:38.705128Z",
-                                "modified_at": "2024-06-21T06:58:38.707408Z"
-                            }
-                        ]
-                    },
-                    {
-                        "id": 31,
-                        "user_id_id": 2,
-                        "topic_name": "Healthy Diet abc",
-                        "start_date": "2024-06-01",
-                        "end_date": "2025-12-15",
-                        "duration_days": 562,
-                        "created_at": "2024-06-21T07:03:59.779964Z",
-                        "modified_at": "2024-06-21T07:03:59.792578Z",
-                        "tasks": []
-                    },
-                    {
-                        "id": 35,
-                        "user_id_id": 2,
-                        "topic_name": "Improve English",
-                        "start_date": "2024-06-21",
-                        "end_date": "2024-07-31",
-                        "duration_days": 40,
-                        "created_at": "2024-06-21T07:19:02.619727Z",
-                        "modified_at": "2024-06-21T07:19:02.633243Z",
-                        "tasks": [
-                            {
-                                "id": 54,
-                                "taskname": "Read book",
-                                "topic_id_id": 35,
-                                "user_id_id": 2,
-                                "times": 15.0,
-                                "system_defined_unit": "Pages",
-                                "user_defined_unit": null,
-                                "completed_times": null,
-                                "created_at": "2024-06-21T07:19:02.639463Z",
-                                "modified_at": "2024-06-21T07:19:02.643353Z"
-                            }
-                        ]
-                    }
-                ]
-            }
-        }
+        [{ "created_at": "2024-06-25T10:11:53.313796Z", "duration_days": 44, "end_date": "2024-07-15", "id": 51, "is_completed": false, "modified_at": "2024-06-25T10:11:53.327026Z", "start_date": "2024-06-01", "tasks": [[Object], [Object], [Object], [Object], [Object], [Object]], "topic_name": "improve vocabulary", "user_id_id": 74 }, { "created_at": "2024-06-26T14:03:34.233475Z", "duration_days": 136, "end_date": "2024-10-15", "id": 75, "is_completed": false, "modified_at": "2024-06-26T14:03:34.246705Z", "start_date": "2024-06-01", "tasks": [[Object], [Object], [Object], [Object], [Object], [Object]], "topic_name": "Healthy Diet", "user_id_id": 74 }, { "created_at": "2024-06-26T14:22:33.860446Z", "duration_days": 136, "end_date": "2024-10-15", "id": 76, "is_completed": false, "modified_at": "2024-06-26T14:22:33.875656Z", "start_date": "2024-06-01", "tasks": [], "topic_name": "Healthy Diet", "user_id_id": 74 }, { "created_at": "2024-06-26T14:22:34.714685Z", "duration_days": 136, "end_date": "2024-10-15", "id": 77, "is_completed": false, "modified_at": "2024-06-26T14:22:34.727156Z", "start_date": "2024-06-01", "tasks": [], "topic_name": "Healthy Diet", "user_id_id": 74 }, { "created_at": "2024-06-26T14:22:35.535821Z", "duration_days": 136, "end_date": "2024-10-15", "id": 78, "is_completed": false, "modified_at": "2024-06-26T14:22:35.548575Z", "start_date": "2024-06-01", "tasks": [], "topic_name": "Healthy Diet", "user_id_id": 74 }]
     );
 
     const title = route.params;
@@ -235,12 +37,38 @@ const HomePage = ({ route, navigation }) => {
     const fetchGoalsList = () => {
         fetchAllGoals()
             .then((res) => {
-                let result = res.data
-                console.log("result", result.data.topics);
+                let result = res.data.data.topics;
+                console.log("result", result);
                 setGoalsList(result);
             })
             .catch((err) => {
                 console.log("Error while fetching Goal list", err);
+            })
+    }
+
+    const deleteGoal = (goalId) => {
+        deleteSpecificGoal(goalId)
+            .then((res) => {
+                let result = res.data;
+                console.log("result:", result);
+                if (result.success === true) {
+                    let newGoallist = goalsList?.filter((goal) => {
+                        console.log(goal.id, goalId)
+                        return goal.id !== goalId
+                    })
+                    console.log("newGoallist", newGoallist.length())
+                    setGoalsList();
+                } else {
+                    Alert.alert("Operation Failed", "Please try again", [
+                        {
+                            text: "OK",
+                            onPress: () => { },
+                        },
+                    ]);
+                }
+            })
+            .catch((err) => {
+                console.log("Error while deleting Goal", err)
             })
     }
 
@@ -260,24 +88,38 @@ const HomePage = ({ route, navigation }) => {
 
     // if (!loginStatus) return <Login />
 
-    console.log("GoalList", goalsList.data.topics)
+    // console.log("GoalList", goalsList.data.topics)
 
     return (
         <ScrollView>
-            {goalsList?.data?.topics?.map(goal => (
-                <CardView key={goal.id} goal={goal} navigation={navigation} />
+            {goalsList?.map(goal => (
+                <CardView
+                    key={goal.id}
+                    goal={goal}
+                    navigation={navigation}
+                    handleDelete={(goalId) => deleteGoal(goalId)}
+                />
             ))}
         </ScrollView>
     )
 }
 
 const CardView = (props) => {
+
     let date = moment(props.goal.created_at)
+    let goalData = props.goal
+    // console.log("goalData", goalData.id)
 
     return (
 
         <Card style={styles.cardContainer} >
-            <TouchableOpacity >
+            <TouchableOpacity
+                onPress={() => {
+                    props.navigation.navigate("Goal", {
+                        goalData
+                    })
+                }}
+            >
                 <View style={styles.cardContent}>
                     <Card.Title title={props.goal.topic_name} style={{ marginRight: "auto" }} />
                 </View>
@@ -291,8 +133,19 @@ const CardView = (props) => {
                 </Card.Content>
             </TouchableOpacity>
             <Card.Actions style={styles.cardFooter}>
-                <Button style={styles.editBtn}>Edit</Button>
-                <Button style={styles.deleteBtn}>Delete</Button>
+                <Button style={styles.editBtn} onPress={""}>Edit</Button>
+                <Button style={styles.deleteBtn} onPress={() => Alert.alert("Are you sure you want delete this Goal?", "Press cancel to go back", [
+                    {
+                        text: "Cancel   ",
+                        onPress: () => { },
+                    },
+                    {
+                        text: "Delete",
+                        onPress: () => { props.handleDelete(goalData.id) },
+                    },
+                ])}>
+                    Delete
+                </Button>
             </Card.Actions>
         </Card>
     )
@@ -312,14 +165,18 @@ const styles = StyleSheet.create({
     },
     cardFooter: {
         width: "100%",
-        marginTop: 10
+        marginTop: 10,
+        gap: 5
     },
     editBtn: {
-        width: "50%",
+        width: "40%",
         marginRight: "auto",
+        borderRadius: 5,
     },
     deleteBtn: {
-        width: "50%",
-        marginRight: "auto"
+        width: "40%",
+        marginRight: "auto",
+        borderRadius: 5,
+        backgroundColor: "#dd4b39"
     }
 })
