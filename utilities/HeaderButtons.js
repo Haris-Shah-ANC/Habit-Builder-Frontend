@@ -38,8 +38,8 @@ export const GoogleLogo = () => {
 export const DeleteLogo = () => {
     return (
         <Ionicons
-            name='trash-bin'
-            color='black'
+            name='trash'
+            color='red'
             size={20}
         />
     )

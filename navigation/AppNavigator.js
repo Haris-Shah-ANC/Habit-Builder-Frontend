@@ -32,14 +32,14 @@ export const AppNavigator = () => {
 
   const checkLoginStatus = async () => {
     const isLoggedIn = await getToken();
-    console.log("loginStatus", isLoggedIn);
+    // console.log("loginStatus", isLoggedIn);
     setLoginStatus(isLoggedIn)
   }
 
   React.useEffect(() => {
     checkLoginStatus()
   }, [])
-  console.log("loginStatus", loginStatus);
+  // console.log("loginStatus", loginStatus);
 
   return (
     <Stack.Navigator >

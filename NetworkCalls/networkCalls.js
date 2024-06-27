@@ -42,12 +42,31 @@ export const fetchAllGoals = async () => {
     })
 }
 
-export const deleteSpecificGoal = async (goalId) => {
+export const deleteSpecificGoal = (goalId) => {
     // let token = await fetchToken();
     let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI0NDkyOTg0LCJpYXQiOjE3MTkzMDg5ODQsImp0aSI6IjNjM2IwZTkwMDhlODQwZWU5MjFhODBhZGJhNDA5YzZiIiwidXNlcl9pZCI6NzR9.Tev6jzYS8WaLniMmrEf8PbEIk44BNyyK1NI7jqgiItg"
 
     return new Promise((resolve, reject) => {
         axios.delete(`${HOST}/habitapp/topic/${goalId}/`, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        })
+            .then((res) => {
+                resolve(res);
+            })
+            .catch((err) => {
+                reject(err);
+            })
+    })
+}
+
+export const deleteSpecificSubGoal = (subGoalId) => {
+    // let token = await fetchToken();
+    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI0NDkyOTg0LCJpYXQiOjE3MTkzMDg5ODQsImp0aSI6IjNjM2IwZTkwMDhlODQwZWU5MjFhODBhZGJhNDA5YzZiIiwidXNlcl9pZCI6NzR9.Tev6jzYS8WaLniMmrEf8PbEIk44BNyyK1NI7jqgiItg"
+
+    return new Promise((resolve, reject) => {
+        axios.delete(`${HOST}/delete-task/?taskid=${subGoalId}`, {
             headers: {
                 "Authorization": `Bearer ${token}`
             }

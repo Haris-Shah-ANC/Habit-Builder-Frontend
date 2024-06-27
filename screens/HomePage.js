@@ -5,14 +5,16 @@ import { HeaderButtons, Item } from "react-navigation-header-buttons";
 import CustomHeaderButton, { AddNewGoalButton, DeleteLogo } from '../utilities/HeaderButtons';
 import { getLoginStatus } from '../config/storageCOnfig,';
 import Login from './Authentication/Login';
-import { Avatar, Button, Card, Text } from 'react-native-paper';
+import { Button, Card, Text } from 'react-native-paper';
 import { deleteSpecificGoal, fetchAllGoals } from '../NetworkCalls/networkCalls';
 import { ScrollView } from 'react-native-virtualized-view';
 import moment from 'moment/moment';
+import { useIsFocused } from '@react-navigation/native';
 
 const HomePage = ({ route, navigation }) => {
 
     const [loginStatus, setLoginStatus] = React.useState(null);
+    const isFocused = useIsFocused();
 
     const [goalsList, setGoalsList] = React.useState(
         [{ "created_at": "2024-06-25T10:11:53.313796Z", "duration_days": 44, "end_date": "2024-07-15", "id": 51, "is_completed": false, "modified_at": "2024-06-25T10:11:53.327026Z", "start_date": "2024-06-01", "tasks": [[Object], [Object], [Object], [Object], [Object], [Object]], "topic_name": "improve vocabulary", "user_id_id": 74 }, { "created_at": "2024-06-26T14:03:34.233475Z", "duration_days": 136, "end_date": "2024-10-15", "id": 75, "is_completed": false, "modified_at": "2024-06-26T14:03:34.246705Z", "start_date": "2024-06-01", "tasks": [[Object], [Object], [Object], [Object], [Object], [Object]], "topic_name": "Healthy Diet", "user_id_id": 74 }, { "created_at": "2024-06-26T14:22:33.860446Z", "duration_days": 136, "end_date": "2024-10-15", "id": 76, "is_completed": false, "modified_at": "2024-06-26T14:22:33.875656Z", "start_date": "2024-06-01", "tasks": [], "topic_name": "Healthy Diet", "user_id_id": 74 }, { "created_at": "2024-06-26T14:22:34.714685Z", "duration_days": 136, "end_date": "2024-10-15", "id": 77, "is_completed": false, "modified_at": "2024-06-26T14:22:34.727156Z", "start_date": "2024-06-01", "tasks": [], "topic_name": "Healthy Diet", "user_id_id": 74 }, { "created_at": "2024-06-26T14:22:35.535821Z", "duration_days": 136, "end_date": "2024-10-15", "id": 78, "is_completed": false, "modified_at": "2024-06-26T14:22:35.548575Z", "start_date": "2024-06-01", "tasks": [], "topic_name": "Healthy Diet", "user_id_id": 74 }]
@@ -38,7 +40,7 @@ const HomePage = ({ route, navigation }) => {
         fetchAllGoals()
             .then((res) => {
                 let result = res.data.data.topics;
-                console.log("result", result);
+                // console.log("result", result);
                 setGoalsList(result);
             })
             .catch((err) => {
@@ -50,14 +52,17 @@ const HomePage = ({ route, navigation }) => {
         deleteSpecificGoal(goalId)
             .then((res) => {
                 let result = res.data;
-                console.log("result:", result);
                 if (result.success === true) {
                     let newGoallist = goalsList?.filter((goal) => {
-                        console.log(goal.id, goalId)
                         return goal.id !== goalId
                     })
-                    console.log("newGoallist", newGoallist.length())
-                    setGoalsList();
+                    Alert.alert("Success", "Goal deleted Successfully", [
+                        {
+                            text: "OK",
+                            onPress: () => { },
+                        },
+                    ]);
+                    setGoalsList(newGoallist);
                 } else {
                     Alert.alert("Operation Failed", "Please try again", [
                         {
@@ -73,8 +78,10 @@ const HomePage = ({ route, navigation }) => {
     }
 
     React.useEffect(() => {
-        fetchGoalsList()
-    }, [])
+        if (isFocused) {
+            fetchGoalsList()
+        }
+    }, [isFocused])
 
     // const checkLoginStatus = async () => {
     //     const isLoggedIn = await getLoginStatus();
@@ -91,16 +98,29 @@ const HomePage = ({ route, navigation }) => {
     // console.log("GoalList", goalsList.data.topics)
 
     return (
-        <ScrollView>
-            {goalsList?.map(goal => (
-                <CardView
-                    key={goal.id}
-                    goal={goal}
-                    navigation={navigation}
-                    handleDelete={(goalId) => deleteGoal(goalId)}
-                />
-            ))}
-        </ScrollView>
+        <>
+            {(goalsList && goalsList.length > 0) ?
+                (
+                    <ScrollView>
+                        {goalsList?.map(goal => (
+                            <CardView
+                                key={goal.id}
+                                goal={goal}
+                                navigation={navigation}
+                                handleDelete={(goalId) => deleteGoal(goalId)}
+                            />
+                        ))}
+                    </ScrollView>
+                ) :
+                (
+                    <View style={styles.emptyPageContainer}>
+                        <Text style={styles.emptyPageText}>
+                            No Goals Found
+                        </Text>
+                    </View>
+                )
+            }
+        </>
     )
 }
 
@@ -178,5 +198,14 @@ const styles = StyleSheet.create({
         marginRight: "auto",
         borderRadius: 5,
         backgroundColor: "#dd4b39"
+    },
+    emptyPageContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    emptyPageText: {
+        fontSize: 20,
+        fontWeight: "bold",
     }
 })
