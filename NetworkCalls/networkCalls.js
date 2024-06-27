@@ -42,7 +42,7 @@ export const fetchAllGoals = async () => {
     })
 }
 
-export const deleteSpecificGoal = (goalId) => {
+export const deleteSpecificGoal = async (goalId) => {
     // let token = await fetchToken();
     let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI0NDkyOTg0LCJpYXQiOjE3MTkzMDg5ODQsImp0aSI6IjNjM2IwZTkwMDhlODQwZWU5MjFhODBhZGJhNDA5YzZiIiwidXNlcl9pZCI6NzR9.Tev6jzYS8WaLniMmrEf8PbEIk44BNyyK1NI7jqgiItg"
 
@@ -61,12 +61,52 @@ export const deleteSpecificGoal = (goalId) => {
     })
 }
 
-export const deleteSpecificSubGoal = (subGoalId) => {
+export const deleteSpecificSubGoal = async (subGoalId) => {
     // let token = await fetchToken();
     let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI0NDkyOTg0LCJpYXQiOjE3MTkzMDg5ODQsImp0aSI6IjNjM2IwZTkwMDhlODQwZWU5MjFhODBhZGJhNDA5YzZiIiwidXNlcl9pZCI6NzR9.Tev6jzYS8WaLniMmrEf8PbEIk44BNyyK1NI7jqgiItg"
 
     return new Promise((resolve, reject) => {
         axios.delete(`${HOST}/delete-task/?taskid=${subGoalId}`, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        })
+            .then((res) => {
+                resolve(res);
+            })
+            .catch((err) => {
+                reject(err);
+            })
+    })
+}
+
+export const incrementSubGoalCount = async (payloadData, subGoalId) => {
+    // let token = await fetchToken();
+    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI0NDkyOTg0LCJpYXQiOjE3MTkzMDg5ODQsImp0aSI6IjNjM2IwZTkwMDhlODQwZWU5MjFhODBhZGJhNDA5YzZiIiwidXNlcl9pZCI6NzR9.Tev6jzYS8WaLniMmrEf8PbEIk44BNyyK1NI7jqgiItg"
+
+    return new Promise((resolve, reject) => {
+        axios.post(`${HOST}/new-timestamp/?taskid=${subGoalId}`, payloadData,
+            {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+            .then((res) => {
+                resolve(res);
+            })
+            .catch((err) => {
+                reject(err);
+            })
+    })
+}
+
+export const getAllTimeStamps = (subGoalId) => {
+    // let token = await fetchToken();
+    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI0NDkyOTg0LCJpYXQiOjE3MTkzMDg5ODQsImp0aSI6IjNjM2IwZTkwMDhlODQwZWU5MjFhODBhZGJhNDA5YzZiIiwidXNlcl9pZCI6NzR9.Tev6jzYS8WaLniMmrEf8PbEIk44BNyyK1NI7jqgiItg"
+
+    return new Promise((resolve, reject) => {
+
+        axios.get(`${HOST}/task-timestamps/?taskid=${subGoalId}`, {
             headers: {
                 "Authorization": `Bearer ${token}`
             }

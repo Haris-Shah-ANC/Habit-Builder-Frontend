@@ -1,4 +1,4 @@
-import { Text } from "react-native";
+import { StyleSheet, Text,View } from "react-native";
 import { getToken } from "../config/storageCOnfig,";
 
 export const RedStar = () => {
@@ -10,3 +10,27 @@ export const fetchToken = async () => {
     console.log("token", token);
     return token
 }
+
+export const CenterText = (props) => {
+
+    return (
+        <View style={styles.container}>
+            <Text style={styles.text}>
+                {props.text}
+            </Text>
+        </View>
+    )
+}
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        margin: 10,
+    },
+    text: {
+        fontSize: 15,
+        fontWeight: "bold",
+    }
+})

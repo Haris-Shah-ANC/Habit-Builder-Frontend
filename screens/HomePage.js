@@ -10,6 +10,7 @@ import { deleteSpecificGoal, fetchAllGoals } from '../NetworkCalls/networkCalls'
 import { ScrollView } from 'react-native-virtualized-view';
 import moment from 'moment/moment';
 import { useIsFocused } from '@react-navigation/native';
+import { CenterText } from '../utilities/utils';
 
 const HomePage = ({ route, navigation }) => {
 
@@ -113,11 +114,7 @@ const HomePage = ({ route, navigation }) => {
                     </ScrollView>
                 ) :
                 (
-                    <View style={styles.emptyPageContainer}>
-                        <Text style={styles.emptyPageText}>
-                            No Goals Found
-                        </Text>
-                    </View>
+                    <CenterText text={"No Goals Found"} />
                 )
             }
         </>
@@ -199,13 +196,4 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         backgroundColor: "#dd4b39"
     },
-    emptyPageContainer: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    emptyPageText: {
-        fontSize: 20,
-        fontWeight: "bold",
-    }
 })
