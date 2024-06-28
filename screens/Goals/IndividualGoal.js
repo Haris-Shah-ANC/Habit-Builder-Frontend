@@ -1,17 +1,19 @@
 import React from 'react'
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, TextInput, Platform } from 'react-native';
 import { HeaderButtons } from 'react-navigation-header-buttons';
 import CustomHeaderButton, { DeleteLogo } from '../../utilities/HeaderButtons';
 import moment from 'moment';
 import { Button, Card, Modal, Provider, Divider } from 'react-native-paper';
 import BottomSheet from "react-native-gesture-bottom-sheet";
-import { deleteSpecificSubGoal, getAllTimeStamps, incrementSubGoalCount } from '../../NetworkCalls/networkCalls';
+import { deleteSpecificSubGoal, deleteTimeStamp, getAllTimeStamps, incrementSubGoalCount } from '../../NetworkCalls/networkCalls';
 import { CenterText } from '../../utilities/utils';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const IndividualGoal = (props) => {
     // console.log("props in IndividualGoal", subGoalsList);
 
     const [isModalVisible, setIsModalVisible] = React.useState(false);
+    const [timeStampsList, setTimeStampsList] = React.useState(null);
 
     let startDate = moment(props.route.params.goalData.created_at);
     let endDate = moment(props.route.params.goalData.end_date);
@@ -71,6 +73,46 @@ const IndividualGoal = (props) => {
             })
     }
 
+    const fetchTimeStampList = (subGoalId) => {
+        getAllTimeStamps(subGoalId)
+            .then((res) => {
+                let result = res.data;
+                // console.log("result", result.taskcompleted);
+                if (result.success === true) {
+                    setTimeStampsList(result.taskcompleted);
+                }
+            })
+            .catch((err) => {
+                console.log("Error while fetching TimeStamps List", err)
+            })
+    }
+
+    const deleteTimeStampEntry = (timeStampId, subGoalId) => {
+        deleteTimeStamp(timeStampId)
+            .then((res) => {
+                let result = res.data;
+                console.log("result", result);
+                if (result.success === true) {
+                    let newTimeStampList = timeStampsList.filter((timeStamp) => {
+                        return timeStamp.id !== timeStampId
+                    })
+                    let newSubGoalsList = subGoalsList.filter((subGoal) => {
+                        if (subGoal.id !== subGoalId) {
+                            return subGoal
+                        } else {
+                            subGoal.completed_times -= 1
+                            return subGoal
+                        }
+                    })
+                    setSubGoalsList(newSubGoalsList);
+                    setTimeStampsList(newTimeStampList);
+                }
+            })
+            .catch((err) => {
+                console.log("Error while deleting TimeStamp", err);
+            })
+    }
+
     return (
         <>
             <ScrollView>
@@ -81,6 +123,9 @@ const IndividualGoal = (props) => {
                         handleDelete={(subGoalId) => deleteSubGoal(subGoalId)}
                         showModal={() => setIsModalVisible(true)}
                         handleAddClick={(subGoalId) => addSubGaolCount(subGoalId)}
+                        getTimeStampsList={(subGoalId) => fetchTimeStampList(subGoalId)}
+                        handleTimeStampDelete={(timeStampId, subGoalId) => deleteTimeStampEntry(timeStampId, subGoalId)}
+                        timeStampsList={timeStampsList}
                     />
                 ))}
             </ScrollView>
@@ -96,30 +141,48 @@ const IndividualGoal = (props) => {
 }
 
 const SubGoalView = (props) => {
+    console.log("subGoalData", props.subGoalData);
+    const [editableRowId, setEditableRowId] = React.useState(null);
+    const [isPickerVisible, setIsPickerVisible] = React.useState(false);
+    const [pickerMode, setPickerMode] = React.useState("date");
+    const [datePickerData, setDatePickerData] = React.useState(new Date());
+    const [timePickerData, setTimePickerData] = React.useState(new Date());
     let bottomSheet = React.useRef();
-    let completedTimes = props.subGoalData.completed_times ? props.subGoalData.completed_times : 0
     let totalTimes = props.subGoalData.times;
-    const [timeStampsList, setTimeStampsList] = React.useState(null);
+    let completedTimes = props.subGoalData.completed_times ? props.subGoalData.completed_times : 0
 
-    const fetchTimeStampList = (subGoalId) => {
-        getAllTimeStamps(subGoalId)
-            .then((res) => {
-                let result = res.data;
-                // console.log("result", result.taskcompleted);
-                if (result.success === true) {
-                    setTimeStampsList(result.taskcompleted);
-                }
-            })
-            .catch((err) => {
-                console.log("Error while fetching TimeStamps List", err)
-            })
-    }
 
+
+    // Edit TimeStamp Related Code
+    const showMode = (currentMode) => {
+        setIsPickerVisible(true);
+        setPickerMode(currentMode);
+    };
+
+    const onPickerValueChange = (event, selectedDate, mode) => {
+        const currentDate = selectedDate || date;
+        console.log("currentDate", moment(currentDate).format("MMM Do YY"));
+        if (mode === "date") {
+            let formattedDate = moment(currentDate).format("MMM Do YY")
+            setDatePickerData(currentDate);
+            setIsPickerVisible(false);
+            return
+        } else {
+            setTimePickerData(currentDate);
+            setIsPickerVisible(false);
+            return
+        }
+    };
+
+    // console.log("PickerData", datePickerData);
     return (
         <Provider>
             <Card style={styles.cardContainer}>
                 <TouchableOpacity
-                    onPress={() => { bottomSheet.current.show(); fetchTimeStampList(props.subGoalData.id) }}
+                    onPress={() => {
+                        bottomSheet.current.show();
+                        props.getTimeStampsList(props.subGoalData.id)
+                    }}
                 >
                     <View style={styles.cartTitle}>
                         <Card.Title title={props.subGoalData.taskname} style={{ marginRight: "auto" }} />
@@ -161,7 +224,7 @@ const SubGoalView = (props) => {
                 }
             </Card>
 
-            <BottomSheet hasDraggableIcon ref={bottomSheet} height={300} style={{ position: "absolute", backgroundColor: "green" }} >
+            <BottomSheet hasDraggableIcon ref={bottomSheet} height={500} style={{ position: "absolute", backgroundColor: "green" }}>
                 <Card style={styles.cardContainer}>
                     <View style={styles.cartTitle}>
                         <Card.Title title={props.subGoalData.taskname} style={{ marginRight: "auto" }} />
@@ -169,32 +232,96 @@ const SubGoalView = (props) => {
                             {`${completedTimes}/${props.subGoalData.times}`}
                         </Text>
                     </View>
-                    {timeStampsList?.map((timeStamp) => {
+                    <Divider />
+                    {props.timeStampsList?.map((timeStamp) => {
                         // console.log(timeStamp)
                         return (
-                            <View
-                                key={timeStamp.id}
-                            >
-                                <Text>
-                                    {moment(timeStamp.timestamp, "YYYY-MM-DDTH:mm:ss").format('MMM Do YY, h:mm a')}
-                                </Text>
+                            <View key={timeStamp.id}>
+                                <View style={styles.bottomSheetContainer}>
+                                    {/* {editableRowId !== timeStamp.id ?
+                                        ( */}
+                                    <>
+                                        <Text style={styles.bottomSheetText}>
+                                            {moment(timeStamp.timestamp, "YYYY-MM-DDTH:mm:ss").format('MMM Do YY, h:mm a')}
+                                        </Text>
+
+                                        {/* <Button
+                                            icon={"pen"}
+                                            onPress={() => setEditableRowId(timeStamp.id)}
+                                        /> */}
+                                        <Button
+                                            icon={"delete"}
+                                            onPress={() => Alert.alert("Are you sure you want delete this TimeStamp?", "Press cancel to go back", [
+                                                {
+                                                    text: "Cancel   ",
+                                                    onPress: () => { },
+                                                },
+                                                {
+                                                    text: "Delete",
+                                                    onPress: () => { props.handleTimeStampDelete(timeStamp.id, props.subGoalData.id) },
+                                                },
+                                            ])}
+                                        />
+                                    </>
+                                    {/* ) : (
+                                            <View >
+                                                <View style={{ flexDirection: "row", marginLeft: 0 }}>
+                                                    <Button
+                                                        onPress={() => showMode("date")}
+                                                        icon="calendar"
+                                                    >
+                                                        {datePickerData.toDateString().slice(0, -5)}
+                                                    </Button>
+                                                    <Button
+                                                        style={{ marginLeft: -10 }}
+                                                        onPress={() => showMode("time")}
+                                                        icon="clock"
+                                                    >
+                                                        {timePickerData.toTimeString().slice(0, -12)}
+                                                    </Button>
+                                                </View>
+                                                <View style={styles.editableContainer}>
+                                                    <Button
+                                                        mode='contained-tonal'
+                                                        style={styles.saveBtn}
+                                                        onPress={() => setEditableRowId(null)}
+                                                    >
+                                                        Cancel
+                                                    </Button>
+                                                    <Button
+                                                        mode='contained-tonal'
+                                                        style={styles.saveBtn}
+                                                        onPress={() => console.log("TODO: API call of Edit")}
+                                                    >
+                                                        Save
+                                                    </Button>
+                                                </View>
+                                                {isPickerVisible && (
+                                                    <DateTimePicker
+                                                        testID="dateTimePicker"
+                                                        value={pickerMode === "date" ? datePickerData : timePickerData}
+                                                        mode={pickerMode}
+                                                        is24Hour={true}
+                                                        display="default"
+                                                        onChange={(event, selectedDate) => onPickerValueChange(event, selectedDate, pickerMode)}
+                                                    />
+                                                )}
+                                            </View>
+                                        )
+                                    } */}
+                                </View>
                                 <Divider />
                             </View>
-
                         )
                     })}
+
+
                 </Card>
             </BottomSheet>
 
         </Provider>
     )
 }
-
-// export const IndividualGoalScreenOptions = (props) => {
-//     return {
-//         headerTitle: props.route.params.goalData.topic_name,
-//     }
-// }
 
 export default IndividualGoal;
 
@@ -211,7 +338,8 @@ const styles = StyleSheet.create({
     },
     countText: {
         fontSize: 15,
-        marginRight: 10
+        marginRight: 20,
+        fontWeight: "bold"
     },
     plusOneButton: {
         margin: 10,
@@ -225,4 +353,22 @@ const styles = StyleSheet.create({
         margin: 10,
         top: "0%"
     },
+    bottomSheetContainer: {
+        margin: 5,
+        flexDirection: "row"
+    },
+    bottomSheetText: {
+        height: 40,
+        marginLeft: 5,
+        paddingTop: 5,
+        marginRight: "auto"
+    },
+    editableContainer: {
+        flexDirection: "row",
+        marginTop: 10
+    },
+    saveBtn: {
+        borderRadius: 5,
+        marginLeft: 50,
+    }
 })
