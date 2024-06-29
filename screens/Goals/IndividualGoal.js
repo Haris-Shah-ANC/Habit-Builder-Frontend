@@ -1,9 +1,9 @@
 import React from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Platform } from 'react-native';
 import { HeaderButtons } from 'react-navigation-header-buttons';
-import CustomHeaderButton, { DeleteLogo } from '../../utilities/HeaderButtons';
+import CustomHeaderButton, { DeleteLogo, EditLogo } from '../../utilities/HeaderButtons';
 import moment from 'moment';
-import { Button, Card, Modal, Provider, Divider } from 'react-native-paper';
+import { Button, Card, Modal, Provider, Divider, TextInput } from 'react-native-paper';
 import BottomSheet from "react-native-gesture-bottom-sheet";
 import { deleteSpecificSubGoal, deleteTimeStamp, getAllTimeStamps, incrementSubGoalCount } from '../../NetworkCalls/networkCalls';
 import { CenterText } from '../../utilities/utils';
@@ -14,6 +14,7 @@ const IndividualGoal = (props) => {
 
     const [isModalVisible, setIsModalVisible] = React.useState(false);
     const [timeStampsList, setTimeStampsList] = React.useState(null);
+    const [editableTaskId, setEditableTaskId] = React.useState(null); // for creating new task component
 
     let startDate = moment(props.route.params.goalData.created_at);
     let endDate = moment(props.route.params.goalData.end_date);
@@ -48,23 +49,27 @@ const IndividualGoal = (props) => {
             })
     }
 
-    const addSubGaolCount = (subGoalId, date, time, type) => {
+    const addSubGaolCount = (subGoalId, date, time, type, times, unit) => {
         let currentTimestamp = moment().format('YYYY-MM-DD H:mm:ss');
         let formattedDate = moment(date, "YYYY-MM-DDTH:mm:ss").format("YYYY-MM-DD")
         let formattedTime = moment(time, "YYYY-MM-DDTH:mm:ss").format("H:mm:ss")
         let manualTimeStamp = `${formattedDate} ${formattedTime}`
         let payloadData = {
-            timestamp: type === "current" ? currentTimestamp : manualTimeStamp
+            times: times,
+            timestamp: type === "current" ? currentTimestamp : manualTimeStamp,
+            unit: unit
         }
         incrementSubGoalCount(payloadData, subGoalId)
             .then((res) => {
                 let result = res.data;
+                let times = result.data.times;
+                console.log("result", result.data.times);
                 if (result.success === true) {
                     let newSubGoalsList = subGoalsList.filter((subGoal) => {
                         if (subGoal.id !== subGoalId) {
                             return subGoal
                         } else {
-                            subGoal.completed_times += 1
+                            subGoal.completed_times += parseInt(times)
                             return subGoal
                         }
                     })
@@ -82,6 +87,7 @@ const IndividualGoal = (props) => {
         getAllTimeStamps(subGoalId)
             .then((res) => {
                 let result = res.data;
+                console.log("result", result.taskcompleted)
                 if (result.success === true) {
                     setTimeStampsList(result.taskcompleted);
                 }
@@ -95,6 +101,7 @@ const IndividualGoal = (props) => {
         deleteTimeStamp(timeStampId)
             .then((res) => {
                 let result = res.data;
+                let times = res.data.times
                 if (result.success === true) {
                     let newTimeStampList = timeStampsList.filter((timeStamp) => {
                         return timeStamp.id !== timeStampId
@@ -103,7 +110,7 @@ const IndividualGoal = (props) => {
                         if (subGoal.id !== subGoalId) {
                             return subGoal
                         } else {
-                            subGoal.completed_times -= 1
+                            subGoal.completed_times -= parseInt(times)
                             return subGoal
                         }
                     })
@@ -118,6 +125,12 @@ const IndividualGoal = (props) => {
 
     return (
         <>
+            <Button
+                icon={"plus"}
+                onPress={() => setShowAddWindow(true)}
+            >
+                Add New Task
+            </Button>
             <ScrollView>
                 {subGoalsList.map(subGoal => (
                     <SubGoalView
@@ -125,7 +138,7 @@ const IndividualGoal = (props) => {
                         key={subGoal.id}
                         handleDelete={(subGoalId) => deleteSubGoal(subGoalId)}
                         showModal={() => setIsModalVisible(true)}
-                        handleAddClick={(subGoalId, date, time, type) => addSubGaolCount(subGoalId, date, time, type)}
+                        handleAddClick={(subGoalId, date, time, type, times, unit) => addSubGaolCount(subGoalId, date, time, type, times, unit)}
                         getTimeStampsList={(subGoalId) => fetchTimeStampList(subGoalId)}
                         handleTimeStampDelete={(timeStampId, subGoalId) => deleteTimeStampEntry(timeStampId, subGoalId)}
                         timeStampsList={timeStampsList}
@@ -150,10 +163,12 @@ const SubGoalView = (props) => {
     const [datePickerData, setDatePickerData] = React.useState(new Date());
     const [timePickerData, setTimePickerData] = React.useState(new Date());
     const [showAddWindow, setShowAddWindow] = React.useState(false);
+    const [editableTaskId, setEditableTaskId] = React.useState(null); // for making task card editable
+    const [taskTimes, setTaskTimes] = React.useState(0);
     let bottomSheet = React.useRef();
     let totalTimes = props.subGoalData.times;
     let completedTimes = props.subGoalData.completed_times ? props.subGoalData.completed_times : 0
-
+    let unit = props.subGoalData.system_defined_unit ? props.subGoalData.system_defined_unit : props.subGoalData.user_defined_unit
 
 
     const showMode = (currentMode) => {
@@ -187,6 +202,12 @@ const SubGoalView = (props) => {
                     <View style={styles.cartTitle}>
                         <Card.Title title={props.subGoalData.taskname} style={{ marginRight: "auto" }} />
                         <Button
+                            icon={"pen"}
+                            style={{ marginRight: -40 }}
+                            onPress={() => console.log("subGoalData", props.subGoalData)}
+                        />
+
+                        <Button
                             onPress={() => Alert.alert("Are you sure you want delete this SubGoal?", "Press cancel to go back", [
                                 {
                                     text: "Cancel   ",
@@ -197,14 +218,14 @@ const SubGoalView = (props) => {
                                     onPress: () => { props.handleDelete(props.subGoalData.id) },
                                 },
                             ])}
+                            style={{ marginLeft: 15 }}
                         >
                             <DeleteLogo />
                         </Button>
-
                     </View>
                     <Card.Content>
                         <Text style={styles.countText}>
-                            {`${completedTimes}/${totalTimes}`}
+                            {`${completedTimes}/${totalTimes}  ${unit}`}
                         </Text>
                     </Card.Content>
                 </TouchableOpacity>
@@ -213,7 +234,7 @@ const SubGoalView = (props) => {
                         mode="outlined"
                         style={styles.plusOneButton}
                         // onPress={props.showModal}
-                        onPress={() => props.handleAddClick(props.subGoalData.id, "", "", "current")}
+                        onPress={() => props.handleAddClick(props.subGoalData.id, "", "", "current", 1, unit)}
                     >
                         +1
                     </Button>
@@ -234,17 +255,22 @@ const SubGoalView = (props) => {
                             </Text>
                         </View>
                         <Divider />
-                        {!showAddWindow &&
+                        {completedTimes < totalTimes && !showAddWindow ?
                             <Button
                                 icon={"plus"}
                                 onPress={() => setShowAddWindow(true)}
                             >
                                 Add New
                             </Button>
+                            : (completedTimes === totalTimes) ? (
+                                <CenterText text={"Goal Completed"} />
+                            )
+                                :
+                                ""
                         }
                         {showAddWindow && (
                             <View >
-                                <View style={{ flexDirection: "row", marginLeft: "13%" }}>
+                                <View style={{ flexDirection: "row", marginTop: "2%" }}>
                                     <Button
                                         onPress={() => showMode("date")}
                                         icon="calendar"
@@ -258,6 +284,15 @@ const SubGoalView = (props) => {
                                     >
                                         {timePickerData.toTimeString().slice(0, -12)}
                                     </Button>
+
+                                    <TextInput
+                                        style={{ margin: 10, height: 40, width: '30%', backgroundColor: "white", marginTop: "-2%" }}
+                                        placeholder="times"
+                                        keyboardType='numeric'
+                                        value={taskTimes}
+                                        mode="flat"
+                                        onChangeText={setTaskTimes}
+                                    />
                                 </View>
                                 <View style={styles.editableContainer}>
                                     <Button
@@ -270,7 +305,7 @@ const SubGoalView = (props) => {
                                     <Button
                                         mode='contained-tonal'
                                         style={styles.saveBtn}
-                                        onPress={() => { setShowAddWindow(false); props.handleAddClick(props.subGoalData.id, datePickerData, timePickerData, "manual") }}
+                                        onPress={() => { setShowAddWindow(false); props.handleAddClick(props.subGoalData.id, datePickerData, timePickerData, "manual", taskTimes, unit) }}
                                     >
                                         Save
                                     </Button>
@@ -303,6 +338,9 @@ const SubGoalView = (props) => {
                                             icon={"pen"}
                                             onPress={() => setEditableRowId(timeStamp.id)}
                                         /> */}
+                                            <Text style={{ marginRight: "20%", fontWeight: "bold" }}>
+                                                {timeStamp.times}
+                                            </Text>
                                             <Button
                                                 icon={"delete"}
                                                 onPress={() => Alert.alert("Are you sure you want delete this TimeStamp?", "Press cancel to go back", [
@@ -410,7 +448,9 @@ const styles = StyleSheet.create({
     },
     bottomSheetContainer: {
         margin: 5,
-        flexDirection: "row"
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center"
     },
     bottomSheetText: {
         height: 40,
