@@ -100,7 +100,7 @@ export const incrementSubGoalCount = async (payloadData, subGoalId) => {
     })
 }
 
-export const getAllTimeStamps = (subGoalId) => {
+export const getAllTimeStamps = async (subGoalId) => {
     // let token = await fetchToken();
     let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI0NDkyOTg0LCJpYXQiOjE3MTkzMDg5ODQsImp0aSI6IjNjM2IwZTkwMDhlODQwZWU5MjFhODBhZGJhNDA5YzZiIiwidXNlcl9pZCI6NzR9.Tev6jzYS8WaLniMmrEf8PbEIk44BNyyK1NI7jqgiItg"
 
@@ -120,7 +120,7 @@ export const getAllTimeStamps = (subGoalId) => {
     })
 }
 
-export const deleteTimeStamp = (timeStampId) => {
+export const deleteTimeStamp = async (timeStampId) => {
     // let token = await fetchToken();
     let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI0NDkyOTg0LCJpYXQiOjE3MTkzMDg5ODQsImp0aSI6IjNjM2IwZTkwMDhlODQwZWU5MjFhODBhZGJhNDA5YzZiIiwidXNlcl9pZCI6NzR9.Tev6jzYS8WaLniMmrEf8PbEIk44BNyyK1NI7jqgiItg"
 

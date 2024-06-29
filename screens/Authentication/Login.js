@@ -30,7 +30,7 @@ const Login = (props) => {
         }
         loginUser(payloadData)
             .then(async (res) => {
-                console.log("res", res.data.access)
+                console.log("res", res.data)
                 if (!res.data.access) {
                     Alert.alert("Login Failed", res.data.status ? res.data.status : "Please try again", [
                         {
@@ -44,8 +44,8 @@ const Login = (props) => {
 
                     setToken(res.data.access);
                     setLoginStatus("true");
-                    setUsername(res.data.name);
-                    setUserEmail(res.data.email);
+                    setUsername(res.data.user.first_name);
+                    setUserEmail(res.data.user.email);
                     // setUserId(res.data);
                     fillLoginDetails();
                     // clearFromData();
