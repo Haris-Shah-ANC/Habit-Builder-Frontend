@@ -9,12 +9,14 @@ import { deleteSpecificSubGoal, deleteTimeStamp, getAllTimeStamps, incrementSubG
 import { CenterText } from '../../utilities/utils';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { ScrollView } from 'react-native-gesture-handler';
+import { AddNewSubGoal } from './AddNewSubGoal';
 
 const IndividualGoal = (props) => {
-
+    // console.log("props inside IndividualGoal", props.route.params.goalData.tasks);
     const [isModalVisible, setIsModalVisible] = React.useState(false);
     const [timeStampsList, setTimeStampsList] = React.useState(null);
-    const [editableTaskId, setEditableTaskId] = React.useState(null); // for creating new task component
+    const [showAddNewTaskWindow, setShowAddNewTaskWindow] = React.useState(false); // for creating new task component
+    const goal_id = props.route.params.goalData.id;
 
     let startDate = moment(props.route.params.goalData.created_at);
     let endDate = moment(props.route.params.goalData.end_date);
@@ -87,7 +89,7 @@ const IndividualGoal = (props) => {
         getAllTimeStamps(subGoalId)
             .then((res) => {
                 let result = res.data;
-                console.log("result", result.taskcompleted)
+                // console.log("result", result.taskcompleted)
                 if (result.success === true) {
                     setTimeStampsList(result.taskcompleted);
                 }
@@ -123,14 +125,28 @@ const IndividualGoal = (props) => {
             })
     }
 
+    const closeWindow = (option) => {
+        setShowAddNewTaskWindow(option)
+    }
+
     return (
         <>
-            <Button
-                icon={"plus"}
-                onPress={() => setShowAddWindow(true)}
-            >
-                Add New Task
-            </Button>
+            {
+                (!showAddNewTaskWindow) ?
+                    <Button
+                        icon={"plus"}
+                        onPress={() => setShowAddNewTaskWindow(true)}
+                    >
+                        Add New Task
+                    </Button>
+                    : (
+                        <AddNewSubGoal
+                            closeOption={(option) => closeWindow(option)}
+                            goalId={goal_id}
+                            udpateSubGoalsList={(data) => setSubGoalsList(data)}
+                        />
+                    )
+            }
             <ScrollView>
                 {subGoalsList.map(subGoal => (
                     <SubGoalView

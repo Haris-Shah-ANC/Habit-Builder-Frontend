@@ -42,6 +42,26 @@ export const fetchAllGoals = async () => {
     })
 }
 
+export const fetchAllSubGoals = async (goalId) => {
+    // let token = await fetchToken();
+    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI0NDkyOTg0LCJpYXQiOjE3MTkzMDg5ODQsImp0aSI6IjNjM2IwZTkwMDhlODQwZWU5MjFhODBhZGJhNDA5YzZiIiwidXNlcl9pZCI6NzR9.Tev6jzYS8WaLniMmrEf8PbEIk44BNyyK1NI7jqgiItg"
+
+    return new Promise((resolve, reject) => {
+
+        axios.get(`${HOST}/get-tasks/?topicid=${goalId}`, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        })
+            .then((res) => {
+                resolve(res);
+            })
+            .catch((err) => {
+                reject(err);
+            })
+    })
+}
+
 export const deleteSpecificGoal = async (goalId) => {
     // let token = await fetchToken();
     let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI0NDkyOTg0LCJpYXQiOjE3MTkzMDg5ODQsImp0aSI6IjNjM2IwZTkwMDhlODQwZWU5MjFhODBhZGJhNDA5YzZiIiwidXNlcl9pZCI6NzR9.Tev6jzYS8WaLniMmrEf8PbEIk44BNyyK1NI7jqgiItg"
@@ -67,6 +87,25 @@ export const deleteSpecificSubGoal = async (subGoalId) => {
 
     return new Promise((resolve, reject) => {
         axios.delete(`${HOST}/delete-task/?taskid=${subGoalId}`, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        })
+            .then((res) => {
+                resolve(res);
+            })
+            .catch((err) => {
+                reject(err);
+            })
+    })
+}
+
+export const addNewSubGoal = async (payloadData) => {
+    // let token = await fetchToken();
+    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI0NDkyOTg0LCJpYXQiOjE3MTkzMDg5ODQsImp0aSI6IjNjM2IwZTkwMDhlODQwZWU5MjFhODBhZGJhNDA5YzZiIiwidXNlcl9pZCI6NzR9.Tev6jzYS8WaLniMmrEf8PbEIk44BNyyK1NI7jqgiItg"
+
+    return new Promise((resolve, reject) => {
+        axios.post(`${HOST}/new-task/`, payloadData, {
             headers: {
                 "Authorization": `Bearer ${token}`
             }
@@ -127,6 +166,44 @@ export const deleteTimeStamp = async (timeStampId) => {
 
     return new Promise((resolve, reject) => {
         axios.delete(`${HOST}/delete-timestamp/?id=${timeStampId}`, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        })
+            .then((res) => {
+                resolve(res);
+            })
+            .catch((err) => {
+                reject(err);
+            })
+    })
+}
+
+export const fetchUserDefinedUnits = async () => {
+    // let token = await fetchToken();
+    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI0NDkyOTg0LCJpYXQiOjE3MTkzMDg5ODQsImp0aSI6IjNjM2IwZTkwMDhlODQwZWU5MjFhODBhZGJhNDA5YzZiIiwidXNlcl9pZCI6NzR9.Tev6jzYS8WaLniMmrEf8PbEIk44BNyyK1NI7jqgiItg"
+
+    return new Promise((resolve, reject) => {
+        axios.get(`${HOST}/habitapp/userdefinedunits/`, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        })
+            .then((res) => {
+                resolve(res);
+            })
+            .catch((err) => {
+                reject(err);
+            })
+    })
+}
+
+export const createNewUnit = async (payloadData) => {
+    // let token = await fetchToken();
+    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI0NDkyOTg0LCJpYXQiOjE3MTkzMDg5ODQsImp0aSI6IjNjM2IwZTkwMDhlODQwZWU5MjFhODBhZGJhNDA5YzZiIiwidXNlcl9pZCI6NzR9.Tev6jzYS8WaLniMmrEf8PbEIk44BNyyK1NI7jqgiItg"
+
+    return new Promise((resolve, reject) => {
+        axios.post(`${HOST}/habitapp/userdefinedunits/`, payloadData, {
             headers: {
                 "Authorization": `Bearer ${token}`
             }
