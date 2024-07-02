@@ -23,7 +23,7 @@ const CreateUpdateGoal = ({ navigation }) => {
 
     const addTask = () => {
         if (task) {
-            setTasks([...tasks, { "taskname": task, "system_defined_unit": unit, "times": countOfTask, "user_defined_unit": null }]);
+            setTasks([...tasks, { "taskname": task, "system_defined_unit": unit, "value": countOfTask, "user_defined_unit": null }]);
             setTask('');
             setUnit('');
             setCountOfTask(0);
@@ -46,7 +46,7 @@ const CreateUpdateGoal = ({ navigation }) => {
             enddate: enddate,
             tasks: tasks
         }
-        // console.log("payloadData", payloadData);
+        console.log("payloadData", tasks);
         // console.log({ goalName, fromDate, toDate, tasks, countOfTask });
 
         createGoal(payloadData)
@@ -207,7 +207,7 @@ const CreateUpdateGoal = ({ navigation }) => {
                                             renderItem={({ item }) => (
                                                 <View style={styles.taskContainer}>
                                                     <Text>{item.taskname}</Text>
-                                                    <Text>{item.times}</Text>
+                                                    <Text>{item.value}</Text>
                                                     <Text>{item.system_defined_unit}</Text>
                                                     <IconButton icon="delete" onPress={() => {
                                                         const newTasks = tasks.filter(taskItem => taskItem !== item);

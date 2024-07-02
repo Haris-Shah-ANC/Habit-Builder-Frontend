@@ -57,7 +57,7 @@ const IndividualGoal = (props) => {
         let formattedTime = moment(time, "YYYY-MM-DDTH:mm:ss").format("H:mm:ss")
         let manualTimeStamp = `${formattedDate} ${formattedTime}`
         let payloadData = {
-            times: times,
+            value: times,
             timestamp: type === "current" ? currentTimestamp : manualTimeStamp,
             unit: unit
         }
@@ -65,13 +65,13 @@ const IndividualGoal = (props) => {
             .then((res) => {
                 let result = res.data;
                 let times = result.data.times;
-                console.log("result", result.data.times);
+                // console.log("result", result.data);
                 if (result.success === true) {
                     let newSubGoalsList = subGoalsList.filter((subGoal) => {
                         if (subGoal.id !== subGoalId) {
                             return subGoal
                         } else {
-                            subGoal.completed_times += parseFloat(times)
+                            subGoal.completed_value += parseFloat(times)
                             return subGoal
                         }
                     })
@@ -103,7 +103,7 @@ const IndividualGoal = (props) => {
         deleteTimeStamp(timeStampId)
             .then((res) => {
                 let result = res.data;
-                let times = res.data.times
+                let times = res.data.value
                 if (result.success === true) {
                     let newTimeStampList = timeStampsList.filter((timeStamp) => {
                         return timeStamp.id !== timeStampId
@@ -112,7 +112,7 @@ const IndividualGoal = (props) => {
                         if (subGoal.id !== subGoalId) {
                             return subGoal
                         } else {
-                            subGoal.completed_times -= parseInt(times)
+                            subGoal.completed_value -= parseFloat(times)
                             return subGoal
                         }
                     })
@@ -184,10 +184,11 @@ const SubGoalView = (props) => {
     const [editableTaskId, setEditableTaskId] = React.useState(null);
     const [taskTimes, setTaskTimes] = React.useState(0);
     let bottomSheet = React.useRef();
-    let totalTimes = props.subGoalData.times;
-    let completedTimes = props.subGoalData.completed_times ? props.subGoalData.completed_times : 0
+    let totalTimes = props.subGoalData.value;
+    let completedTimes = props.subGoalData.completed_value ? props.subGoalData.completed_value : 0
     let unit = props.subGoalData.system_defined_unit ? props.subGoalData.system_defined_unit : props.subGoalData.user_defined_unit
 
+    // console.log("Props inside SubGoalView",props.subGoalData)
 
     const showMode = (currentMode) => {
         setIsPickerVisible(true);
@@ -279,7 +280,7 @@ const SubGoalView = (props) => {
                         <View style={styles.cartTitle}>
                             <Card.Title title={props.subGoalData.taskname} style={{ marginRight: "auto" }} />
                             <Text style={styles.countText}>
-                                {`${completedTimes}/${props.subGoalData.times}`}
+                                {`${completedTimes}/${totalTimes}`}
                             </Text>
                         </View>
                         <Divider />
@@ -367,7 +368,7 @@ const SubGoalView = (props) => {
                                             onPress={() => setEditableRowId(timeStamp.id)}
                                         /> */}
                                             <Text style={{ marginRight: "20%", fontWeight: "bold" }}>
-                                                {timeStamp.times}
+                                                {timeStamp.value}
                                             </Text>
                                             <Button
                                                 icon={"delete"}

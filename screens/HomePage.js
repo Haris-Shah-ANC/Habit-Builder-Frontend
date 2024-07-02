@@ -5,12 +5,13 @@ import { HeaderButtons, Item } from "react-navigation-header-buttons";
 import CustomHeaderButton, { AddNewGoalButton, DeleteLogo } from '../utilities/HeaderButtons';
 import { getLoginStatus } from '../config/storageCOnfig,';
 import Login from './Authentication/Login';
-import { Button, Card, Text } from 'react-native-paper';
+import { Button, Card, Provider, Text } from 'react-native-paper';
 import { deleteSpecificGoal, fetchAllGoals } from '../NetworkCalls/networkCalls';
 import { ScrollView } from 'react-native-virtualized-view';
 import moment from 'moment/moment';
 import { useIsFocused } from '@react-navigation/native';
 import { CenterText } from '../utilities/utils';
+import EditGoal from './Goals/EditGoal';
 
 const HomePage = ({ route, navigation }) => {
 
@@ -123,48 +124,58 @@ const HomePage = ({ route, navigation }) => {
 
 const CardView = (props) => {
 
-    let date = moment(props.goal.created_at)
+    let date = moment(props.goal.start_date)
     let goalData = props.goal
     // console.log("goalData", goalData.id)
+    const [editableGoalId, setEditableGoalId] = React.useState(null);
+    // console.log("editableGoalId", editableGoalId)
 
     return (
+        <Provider >
+            {editableGoalId !== goalData.id ?
 
-        <Card style={styles.cardContainer} >
-            <TouchableOpacity
-                onPress={() => {
-                    props.navigation.navigate("Goal", {
-                        goalData
-                    })
-                }}
-            >
-                <View style={styles.cardContent}>
-                    <Card.Title title={props.goal.topic_name} style={{ marginRight: "auto" }} />
-                </View>
-                <Card.Content style={styles.cardContent}>
-                    <Text variant="bodyLarge" style={{ marginRight: "auto" }}>
-                        {date.format('DD MMM YYYY')}
-                    </Text>
-                    <Text variant="bodyLarge" style={{ marginLeft: "auto" }}>
-                        {date.fromNow()}
-                    </Text>
-                </Card.Content>
-            </TouchableOpacity>
-            <Card.Actions style={styles.cardFooter}>
-                <Button style={styles.editBtn} onPress={""}>Edit</Button>
-                <Button style={styles.deleteBtn} onPress={() => Alert.alert("Are you sure you want delete this Goal?", "Press cancel to go back", [
-                    {
-                        text: "Cancel   ",
-                        onPress: () => { },
-                    },
-                    {
-                        text: "Delete",
-                        onPress: () => { props.handleDelete(goalData.id) },
-                    },
-                ])}>
-                    Delete
-                </Button>
-            </Card.Actions>
-        </Card>
+                <Card style={styles.cardContainer} >
+                    <TouchableOpacity
+                        onPress={() => {
+                            props.navigation.navigate("Goal", {
+                                goalData
+                            })
+                        }}
+                    >
+                        <View style={styles.cardContent}>
+                            <Card.Title title={props.goal.topic_name} style={{ marginRight: "auto" }} />
+                        </View>
+                        <Card.Content style={styles.cardContent}>
+                            <Text variant="bodyLarge" style={{ marginRight: "auto" }}>
+                                {date.format('DD MMM YYYY')}
+                            </Text>
+                            <Text variant="bodyLarge" style={{ marginLeft: "auto" }}>
+                                {date.fromNow()}
+                            </Text>
+                        </Card.Content>
+                    </TouchableOpacity>
+                    <Card.Actions style={styles.cardFooter}>
+                        <Button style={styles.editBtn} onPress={() => setEditableGoalId(goalData.id)}>Edit</Button>
+                        <Button style={styles.deleteBtn} onPress={() => Alert.alert("Are you sure you want delete this Goal?", "Press cancel to go back", [
+                            {
+                                text: "Cancel   ",
+                                onPress: () => { },
+                            },
+                            {
+                                text: "Delete",
+                                onPress: () => { props.handleDelete(goalData.id) },
+                            },
+                        ])}>
+                            Delete
+                        </Button>
+                    </Card.Actions>
+                </Card>
+                : (
+                    <EditGoal
+                        closeEditMode={() => setEditableGoalId(null)}
+                    />
+                )}
+        </Provider>
     )
 }
 

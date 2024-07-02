@@ -8,10 +8,10 @@ import { capitalizeFirstLetter } from "../../utilities/utils";
 export const AddNewSubGoal = (props) => {
     let action = props.actionType;
     let subGoalTitle = props?.subGoalData?.taskname;
-    let taskCount = props?.subGoalData?.times;
+    let taskCount = props?.subGoalData?.value;
     let unitValue = props?.subGoalData?.user_defined_unit ? props?.subGoalData?.user_defined_unit : props?.subGoalData?.system_defined_unit
     const [subGoalName, setSubGoalName] = useState(action === "edit" ? subGoalTitle : "");
-    const [count, setCount] = useState(action === "edit" ? taskCount : "");
+    const [count, setCount] = useState(action === "edit" ? taskCount : 1);
     const [unitList, setUnitList] = useState([]);
     const [openDropDown, setOpenDropDown] = useState(false);
     const [value, setValue] = useState(action === "edit" ? unitValue : null);
@@ -101,7 +101,7 @@ export const AddNewSubGoal = (props) => {
         let payloadData = {
             taskname: subGoalName,
             topicid: goalId,
-            times: count,
+            value: count,
             user_defined_unit: !isUnitSystemDefined ? value : null,
             system_defined_unit: isUnitSystemDefined ? value : null
         }
@@ -180,7 +180,7 @@ export const AddNewSubGoal = (props) => {
                         style={styles.unitInput}
                         mode="outlined"
                         label={action === "edit" ? "Total Count" : "Count"}
-                        value={count.toString()}
+                        value={count?.toString()}
                         onChangeText={setCount}
                         keyboardType="numeric"
                     />
