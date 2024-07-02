@@ -15,7 +15,7 @@ const IndividualGoal = (props) => {
     // console.log("props inside IndividualGoal", props.route.params.goalData.tasks);
     const [isModalVisible, setIsModalVisible] = React.useState(false);
     const [timeStampsList, setTimeStampsList] = React.useState(null);
-    const [showAddNewTaskWindow, setShowAddNewTaskWindow] = React.useState(false); // for creating new task component
+    const [showAddNewTaskWindow, setShowAddNewTaskWindow] = React.useState(false);
     const goal_id = props.route.params.goalData.id;
 
     let startDate = moment(props.route.params.goalData.created_at);
@@ -71,7 +71,7 @@ const IndividualGoal = (props) => {
                         if (subGoal.id !== subGoalId) {
                             return subGoal
                         } else {
-                            subGoal.completed_times += parseInt(times)
+                            subGoal.completed_times += parseFloat(times)
                             return subGoal
                         }
                     })
@@ -158,6 +158,8 @@ const IndividualGoal = (props) => {
                         getTimeStampsList={(subGoalId) => fetchTimeStampList(subGoalId)}
                         handleTimeStampDelete={(timeStampId, subGoalId) => deleteTimeStampEntry(timeStampId, subGoalId)}
                         timeStampsList={timeStampsList}
+                        goalId={goal_id}
+                        udpateSubGoalsList={(data) => setSubGoalsList(data)}
                     />
                 ))}
             </ScrollView>
@@ -179,7 +181,7 @@ const SubGoalView = (props) => {
     const [datePickerData, setDatePickerData] = React.useState(new Date());
     const [timePickerData, setTimePickerData] = React.useState(new Date());
     const [showAddWindow, setShowAddWindow] = React.useState(false);
-    const [editableTaskId, setEditableTaskId] = React.useState(null); // for making task card editable
+    const [editableTaskId, setEditableTaskId] = React.useState(null);
     const [taskTimes, setTaskTimes] = React.useState(0);
     let bottomSheet = React.useRef();
     let totalTimes = props.subGoalData.times;
@@ -208,59 +210,69 @@ const SubGoalView = (props) => {
 
     return (
         <Provider>
-            <Card style={styles.cardContainer}>
-                <TouchableOpacity
-                    onPress={() => {
-                        bottomSheet.current.show();
-                        props.getTimeStampsList(props.subGoalData.id)
-                    }}
-                >
-                    <View style={styles.cartTitle}>
-                        <Card.Title title={props.subGoalData.taskname} style={{ marginRight: "auto" }} />
-                        <Button
-                            icon={"pen"}
-                            style={{ marginRight: -40 }}
-                            onPress={() => console.log("subGoalData", props.subGoalData)}
-                        />
-
-                        <Button
-                            onPress={() => Alert.alert("Are you sure you want delete this SubGoal?", "Press cancel to go back", [
-                                {
-                                    text: "Cancel   ",
-                                    onPress: () => { },
-                                },
-                                {
-                                    text: "Delete",
-                                    onPress: () => { props.handleDelete(props.subGoalData.id) },
-                                },
-                            ])}
-                            style={{ marginLeft: 15 }}
-                        >
-                            <DeleteLogo />
-                        </Button>
-                    </View>
-                    <Card.Content>
-                        <Text style={styles.countText}>
-                            {`${completedTimes}/${totalTimes}  ${unit}`}
-                        </Text>
-                    </Card.Content>
-                </TouchableOpacity>
-                {completedTimes < totalTimes ? (
-                    <Button
-                        mode="outlined"
-                        style={styles.plusOneButton}
-                        // onPress={props.showModal}
-                        onPress={() => props.handleAddClick(props.subGoalData.id, "", "", "current", 1, unit)}
+            {(editableTaskId !== props.subGoalData.id) ?
+                <Card style={styles.cardContainer}>
+                    <TouchableOpacity
+                        onPress={() => {
+                            bottomSheet.current.show();
+                            props.getTimeStampsList(props.subGoalData.id)
+                        }}
                     >
-                        +1
-                    </Button>
-                ) :
-                    (
-                        <CenterText text={"Goal Completed"} />
-                    )
-                }
-            </Card>
+                        <View style={styles.cartTitle}>
+                            <Card.Title title={props.subGoalData.taskname} style={{ marginRight: "auto" }} />
+                            <Button
+                                icon={"pen"}
+                                style={{ marginRight: -40 }}
+                                onPress={() => setEditableTaskId(props.subGoalData.id)}
+                            />
 
+                            <Button
+                                onPress={() => Alert.alert("Are you sure you want delete this SubGoal?", "Press cancel to go back", [
+                                    {
+                                        text: "Cancel   ",
+                                        onPress: () => { },
+                                    },
+                                    {
+                                        text: "Delete",
+                                        onPress: () => { props.handleDelete(props.subGoalData.id) },
+                                    },
+                                ])}
+                                style={{ marginLeft: 15 }}
+                            >
+                                <DeleteLogo />
+                            </Button>
+                        </View>
+                        <Card.Content>
+                            <Text style={styles.countText}>
+                                {`${completedTimes}/${totalTimes}  ${unit}`}
+                            </Text>
+                        </Card.Content>
+                    </TouchableOpacity>
+                    {completedTimes < totalTimes ? (
+                        <Button
+                            mode="outlined"
+                            style={styles.plusOneButton}
+                            // onPress={props.showModal}
+                            onPress={() => props.handleAddClick(props.subGoalData.id, "", "", "current", 1, unit)}
+                        >
+                            +1
+                        </Button>
+                    ) :
+                        (
+                            <CenterText text={"Goal Completed"} />
+                        )
+                    }
+                </Card>
+                : (
+                    <AddNewSubGoal
+                        subGoalData={props.subGoalData}
+                        actionType={"edit"}
+                        closeOption={(option) => setEditableTaskId(option)}
+                        goalId={props.goalId}
+                        udpateSubGoalsList={(data) => props.udpateSubGoalsList(data)}
+                    />
+                )
+            }
             <BottomSheet ref={bottomSheet} height={500} style={{ position: "absolute", backgroundColor: "green" }}>
                 <ScrollView>
                     <Card style={styles.cardContainer}>

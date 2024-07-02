@@ -2,15 +2,19 @@ import { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { Button, Card, TextInput } from "react-native-paper";
 import DropDownPicker from 'react-native-dropdown-picker';
-import { addNewSubGoal, createNewUnit, fetchAllSubGoals, fetchUserDefinedUnits } from "../../NetworkCalls/networkCalls";
+import { addNewSubGoal, createNewUnit, fetchAllSubGoals, fetchUserDefinedUnits, updateSubGoal } from "../../NetworkCalls/networkCalls";
 import { capitalizeFirstLetter } from "../../utilities/utils";
 
 export const AddNewSubGoal = (props) => {
-    const [subGoalName, setSubGoalName] = useState("");
-    const [count, setCount] = useState(0);
+    let action = props.actionType;
+    let subGoalTitle = props?.subGoalData?.taskname;
+    let taskCount = props?.subGoalData?.times;
+    let unitValue = props?.subGoalData?.user_defined_unit ? props?.subGoalData?.user_defined_unit : props?.subGoalData?.system_defined_unit
+    const [subGoalName, setSubGoalName] = useState(action === "edit" ? subGoalTitle : "");
+    const [count, setCount] = useState(action === "edit" ? taskCount : "");
     const [unitList, setUnitList] = useState([]);
     const [openDropDown, setOpenDropDown] = useState(false);
-    const [value, setValue] = useState(null);
+    const [value, setValue] = useState(action === "edit" ? unitValue : null);
     const [newItemText, setNewItemText] = useState('');
     const hasFeatchedUnits = useRef(false);
     const [showAddNew, setShowAddNew] = useState(false);
@@ -31,7 +35,7 @@ export const AddNewSubGoal = (props) => {
         fetchUserDefinedUnits()
             .then((res) => {
                 let result = res.data;
-                setUnitList([{ label: 'Add New', value: 'add_new' }, ...result.data])
+                setUnitList([{ label: 'Add New Unit', value: 'add_new' }, ...result.data])
                 hasFeatchedUnits.current = true;
             })
             .catch((err) => {
@@ -81,6 +85,10 @@ export const AddNewSubGoal = (props) => {
     };
 
     const CreateNewSubGoal = (goalId) => {
+        let systemDefinedUnits = ["nos", "kms", "hrs"]
+        let isUnitSystemDefined = systemDefinedUnits.includes(value)
+        let subGoalId = props?.subGoalData?.id;
+
         if (!value) {
             alert("Please select a Unit")
         }
@@ -94,19 +102,36 @@ export const AddNewSubGoal = (props) => {
             taskname: subGoalName,
             topicid: goalId,
             times: count,
-            user_defined_unit: value,
-            system_defined_unit: null
+            user_defined_unit: !isUnitSystemDefined ? value : null,
+            system_defined_unit: isUnitSystemDefined ? value : null
         }
-        addNewSubGoal(payloadData)
-            .then((res) => {
-                let result = res.data;
-                setNewItemText('');
-                props.closeOption(false);
-                getSubGoalList(goalId);
-            })
-            .catch((err) => {
-                console.log("Error while creating SubGoal", err);
-            })
+
+        // console.log("payloadData", payloadData);
+
+        if (action === "edit") {
+            updateSubGoal(payloadData, subGoalId)
+                .then((res) => {
+                    let result = res.data;
+                    setNewItemText('');
+                    props.closeOption(false);
+                    getSubGoalList(goalId);
+                })
+                .catch((err) => {
+                    console.log("Error while updating SubGoal", err);
+                })
+        }
+        else {
+            addNewSubGoal(payloadData)
+                .then((res) => {
+                    let result = res.data;
+                    setNewItemText('');
+                    props.closeOption(false);
+                    getSubGoalList(goalId);
+                })
+                .catch((err) => {
+                    console.log("Error while creating SubGoal", err);
+                })
+        }
     }
 
     return (
@@ -154,8 +179,8 @@ export const AddNewSubGoal = (props) => {
                     <TextInput
                         style={styles.unitInput}
                         mode="outlined"
-                        label="Count"
-                        value={count}
+                        label={action === "edit" ? "Total Count" : "Count"}
+                        value={count.toString()}
                         onChangeText={setCount}
                         keyboardType="numeric"
                     />
@@ -192,7 +217,7 @@ const styles = StyleSheet.create({
     unitInput: {
         marginBottom: 15,
         height: 45,
-        width: "45%"
+        width: "100%"
     },
     btnContainer: {
         marginTop: 10,

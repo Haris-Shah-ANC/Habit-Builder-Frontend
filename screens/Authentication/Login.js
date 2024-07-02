@@ -5,7 +5,7 @@ import { FlatList, ScrollView } from "react-native-gesture-handler";
 import { useState } from "react";
 import { GoogleLogo } from "../../utilities/HeaderButtons";
 import { loginUser } from "./authNetworkCalls";
-import { fillLoginDetails, setLoginStatus, setToken, setUserEmail, setUsername } from "../../config/storageCOnfig,";
+import { fillLoginDetails, setLoginStatus, setToken, setUserEmail, setUserId, setUsername } from "../../config/storageCOnfig,";
 
 
 const Login = (props) => {
@@ -29,7 +29,7 @@ const Login = (props) => {
             password: password
         }
         loginUser(payloadData)
-            .then(async (res) => {
+            .then((res) => {
                 console.log("res", res.data)
                 if (!res.data.access) {
                     Alert.alert("Login Failed", res.data.status ? res.data.status : "Please try again", [
@@ -46,7 +46,7 @@ const Login = (props) => {
                     setLoginStatus("true");
                     setUsername(res.data.user.first_name);
                     setUserEmail(res.data.user.email);
-                    // setUserId(res.data);
+                    setUserId(res.data.user.pk);
                     fillLoginDetails();
                     // clearFromData();
                     props.navigation.navigate('All Goals');
