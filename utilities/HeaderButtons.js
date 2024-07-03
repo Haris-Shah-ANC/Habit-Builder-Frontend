@@ -45,4 +45,14 @@ export const DeleteLogo = () => {
     )
 }
 
+export const ClockLogo = () => {
+    return (
+        <Ionicons
+            name='time-outline'
+            color='blue'
+            size={20}
+        />
+    )
+}
+
 export default CustomHeaderButton;

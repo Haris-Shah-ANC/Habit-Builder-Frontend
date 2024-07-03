@@ -3,19 +3,45 @@ import { StyleSheet, Text, View } from 'react-native'
 import { Button, Card, TextInput } from 'react-native-paper';
 import moment from 'moment';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { updateGoal } from '../../NetworkCalls/networkCalls';
 
 const EditGoal = (props) => {
 
-    const [goalName, setGoalName] = useState("");
-    const [fromDate, setFromDate] = useState(new Date());
-    const [toDate, setToDate] = useState(new Date());
-    const [showDatePicker, setShowDatePicker] = useState(false);
-    const [dateType, setDateType] = useState("from");
+    let goalTitle = props.goalData.topic_name;
+    let start_date = props.goalData.start_date;
+    let end_date = props.goalData.end_date;
 
-    console.log("fromDate", fromDate);
+    const [goalName, setGoalName] = useState(goalTitle);
+    const [fromDate, setFromDate] = useState(start_date);
+    const [toDate, setToDate] = useState(end_date);
+    const [showFromDatePicker, setShowFromDatePicker] = useState(false);
+    const [showToDatePicker, setShowToDatePicker] = useState(false);
 
-    const onPickerValueChange = (e, selectedDate, dateType) => {
+    // console.log("Date", fromDate, toDate);
 
+    const udpateGoalData = () => {
+        let start_date = moment(fromDate).format("YYYY-MM-DD")
+        let end_date = moment(toDate).format("YYYY-MM-DD")
+        let payloadData = {
+            topicname: goalName,
+            startdate: start_date,
+            enddate: end_date
+        }
+        let noDataChange = goalName === goalTitle && start_date === fromDate && end_date === toDate;
+
+        if (!noDataChange) {
+            updateGoal(payloadData, props.goalData.id)
+                .then((res) => {
+                    let result = res.data;
+                    props.refreshPage();
+                    props.closeEditMode(false);
+                })
+                .catch((err) => {
+                    console.log("Error While Updating Goal", err);
+                })
+        } else {
+            props.closeEditMode(false);
+        }
     }
 
     return (
@@ -34,40 +60,56 @@ const EditGoal = (props) => {
                         <Text style={styles.label}>From:</Text>
                         <Button
                             mode="contained-tonal"
-                            onPress={() => { setShowDatePicker(true); setDateType("from") }}
+                            onPress={() => setShowFromDatePicker(true)}
                             icon="calendar"
                             style={styles.dateButton}
                         >
-                            {moment(fromDate.toDateString()).format("MMM Do YY")}
+                            {moment(fromDate).format("MMM Do YY")}
                         </Button>
+                        {showFromDatePicker && (
+                            <DateTimePicker
+                                value={new Date(fromDate)}
+                                mode="date"
+                                display="default"
+                                onChange={(e, selectedDate) => {
+                                    const currentDate = selectedDate || fromDate;
+                                    setShowFromDatePicker(false);
+                                    setFromDate(currentDate);
+                                }}
+                            />
+                        )}
                     </View>
                     <View style={{ marginLeft: "auto" }}>
                         <Text style={styles.label}>To :</Text>
                         <Button
                             mode="contained-tonal"
-                            onPress={() => { setShowDatePicker(true); setDateType("to") }}
+                            onPress={() => setShowToDatePicker(true)}
                             icon="calendar"
                             style={styles.dateButton}
                         >
-                            {moment(toDate.toDateString()).format("MMM Do YY")}
+                            {moment(toDate).format("MMM Do YY")}
                         </Button>
+                        {showToDatePicker && (
+                            <DateTimePicker
+                                value={new Date(toDate)}
+                                mode="date"
+                                display="default"
+                                onChange={(e, selectedDate) => {
+                                    const currentDate = selectedDate || toDate;
+                                    setShowToDatePicker(false);
+                                    setToDate(currentDate);
+                                }}
+                            />
+                        )}
                     </View>
-                    {showDatePicker && (
-                        <DateTimePicker
-                            value={dateType === "from" ? fromDate : toDate}
-                            mode="date"
-                            display="default"
-                            onChange={(e, selectedDate) => {
-                                const currentDate = selectedDate || fromDate;
-                                setShowDatePicker(false);
-                                setFromDate(currentDate);
-                            }}
-                        />
-                    )}
+
                 </View>
 
                 <View style={styles.btnContainer}>
-                    <Button mode='outlined'>
+                    <Button
+                        mode='outlined'
+                        onPress={() => udpateGoalData()}
+                    >
                         Save
                     </Button>
                     <Button

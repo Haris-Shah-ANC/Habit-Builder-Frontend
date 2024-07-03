@@ -110,6 +110,7 @@ const HomePage = ({ route, navigation }) => {
                                 goal={goal}
                                 navigation={navigation}
                                 handleDelete={(goalId) => deleteGoal(goalId)}
+                                refreshPage={() => fetchGoalsList()}
                             />
                         ))}
                     </ScrollView>
@@ -124,11 +125,12 @@ const HomePage = ({ route, navigation }) => {
 
 const CardView = (props) => {
 
-    let date = moment(props.goal.start_date)
+    let created_at = moment(props.goal.created_at)
+    let start_date = moment(props.goal.start_date)
+
     let goalData = props.goal
-    // console.log("goalData", goalData.id)
+    // console.log("goalData", goalData)
     const [editableGoalId, setEditableGoalId] = React.useState(null);
-    // console.log("editableGoalId", editableGoalId)
 
     return (
         <Provider >
@@ -147,10 +149,10 @@ const CardView = (props) => {
                         </View>
                         <Card.Content style={styles.cardContent}>
                             <Text variant="bodyLarge" style={{ marginRight: "auto" }}>
-                                {date.format('DD MMM YYYY')}
+                                {start_date.format('DD MMM YYYY')}
                             </Text>
                             <Text variant="bodyLarge" style={{ marginLeft: "auto" }}>
-                                {date.fromNow()}
+                                {created_at.fromNow()}
                             </Text>
                         </Card.Content>
                     </TouchableOpacity>
@@ -173,6 +175,8 @@ const CardView = (props) => {
                 : (
                     <EditGoal
                         closeEditMode={() => setEditableGoalId(null)}
+                        goalData={goalData}
+                        refreshPage={() => props.refreshPage()}
                     />
                 )}
         </Provider>
