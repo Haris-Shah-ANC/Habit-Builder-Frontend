@@ -5,6 +5,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { GestureHandlerRootView, NativeViewGestureHandler } from 'react-native-gesture-handler';
 import { createGoal } from '../../NetworkCalls/networkCalls';
 import { RedStar } from '../../utilities/utils';
+import moment from 'moment';
+import { CustomDropDownPicker } from '../../utilities/formComponents';
 
 const CreateUpdateGoal = ({ navigation }) => {
     const [goalName, setGoalName] = useState('');
@@ -13,23 +15,30 @@ const CreateUpdateGoal = ({ navigation }) => {
     const [showFromDatePicker, setShowFromDatePicker] = useState(false);
     const [showToDatePicker, setShowToDatePicker] = useState(false);
     const [task, setTask] = useState('');
-    const [countOfTask, setCountOfTask] = useState(0);
-    const [unit, setUnit] = useState('');
-    const [units, setUnits] = useState(['kms', 'hours', 'nos']);
+    const [countOfTask, setCountOfTask] = useState(1);
     const [tasks, setTasks] = useState([]);
-    const [menuVisible, setMenuVisible] = useState(false);
-    const [addingNewUnit, setAddingNewUnit] = useState(false);
-    const [newUnit, setNewUnit] = useState('');
+    const [unitValue, setUnitValue] = useState(null);
+
+    // console.log("unitValue", unitValue)
 
     const addTask = () => {
-        if (task) {
-            setTasks([...tasks, { "taskname": task, "system_defined_unit": unit, "value": countOfTask, "user_defined_unit": null }]);
+        let systemDefinedUnits = ["nos", "kms", "hrs"]
+        let isUnitSystemDefined = systemDefinedUnits.includes(unitValue)
+
+        if (task && unitValue && countOfTask) {
+            setTasks([...tasks, {
+                "taskname": task,
+                "system_defined_unit": isUnitSystemDefined ? unitValue : null,
+                "value": countOfTask,
+                "user_defined_unit": !isUnitSystemDefined ? unitValue : null
+            }]
+            );
             setTask('');
-            setUnit('');
             setCountOfTask(0);
+            // setUnit('');
         }
         else {
-            alert("Please Add Task")
+            alert("Please fill all the details for adding Task")
         }
     };
 
@@ -65,17 +74,6 @@ const CreateUpdateGoal = ({ navigation }) => {
             .catch((err) => {
                 console.log("Error while creating Goal", err);
             })
-
-    };
-
-    const addNewUnit = () => {
-        if (newUnit.trim() && !units.includes(newUnit.trim())) {
-            setUnits([...units, newUnit.trim()]);
-            setUnit(newUnit.trim());
-            setNewUnit('');
-            setAddingNewUnit(false);
-        }
-        setMenuVisible(false);
     };
 
     return (
@@ -83,147 +81,139 @@ const CreateUpdateGoal = ({ navigation }) => {
             <GestureHandlerRootView style={{ flex: 1 }}>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <KeyboardAvoidingView style={styles.container}>
-                        <NativeViewGestureHandler>
-                            <ScrollView
-                                contentContainerStyle={styles.scrollContainer}
-                                showsHorizontalScrollIndicator={false}
-                                showsVerticalScrollIndicator={false}
-                            >
-                                {/* <Title style={styles.header}>New List</Title> */}
-                                <Card style={styles.card}>
-                                    <Card.Content>
-                                        <Text style={styles.label}>Goal: {<RedStar />}</Text>
-                                        <PaperTextInput
-                                            style={styles.input}
-                                            value={goalName}
-                                            onChangeText={setGoalName}
-                                            placeholder="your goal here..."
-                                            mode="outlined"
-                                        />
-                                        <Text style={styles.label}>From: {<RedStar />}</Text>
-                                        <Button
-                                            mode="contained"
-                                            onPress={() => setShowFromDatePicker(true)}
-                                            icon="calendar"
-                                            style={styles.dateButton}
-                                        >
-                                            {fromDate.toDateString()}
-                                        </Button>
-                                        {showFromDatePicker && (
-                                            <DateTimePicker
-                                                value={fromDate}
-                                                mode="date"
-                                                display="default"
-                                                onChange={(event, selectedDate) => {
-                                                    const currentDate = selectedDate || fromDate;
-                                                    setShowFromDatePicker(false);
-                                                    setFromDate(currentDate);
-                                                }}
-                                            />
-                                        )}
-                                        <Text style={styles.label}>To: {<RedStar />}</Text>
-                                        <Button
-                                            mode="contained"
-                                            onPress={() => setShowToDatePicker(true)}
-                                            icon="calendar"
-                                            style={styles.dateButton}
-                                        >
-                                            {toDate.toDateString()}
-                                        </Button>
-                                        {showToDatePicker && (
-                                            <DateTimePicker
-                                                value={toDate}
-                                                mode="date"
-                                                display="default"
-                                                onChange={(event, selectedDate) => {
-                                                    const currentDate = selectedDate || toDate;
-                                                    setShowToDatePicker(false);
-                                                    setToDate(currentDate);
-                                                }}
-                                            />
-                                        )}
-                                        <Divider />
-                                        <Text style={styles.label}>Task</Text>
-                                        <PaperTextInput
-                                            style={styles.input}
-                                            value={task}
-                                            onChangeText={setTask}
-                                            placeholder="Enter task name.."
-                                            mode="outlined"
-                                        />
-
-                                        <Text style={styles.label}>Count of Task:</Text>
-                                        <PaperTextInput
-                                            style={styles.input}
-                                            value={countOfTask}
-                                            onChangeText={setCountOfTask}
-                                            placeholder="enter task count.."
-                                            mode="outlined"
-                                            keyboardType='numeric'
-                                        />
-                                        <Text style={styles.label}>Unit</Text>
-                                        {!addingNewUnit && (
-                                            <Menu
-                                                visible={menuVisible}
-                                                onDismiss={() => setMenuVisible(false)}
-                                                anchor={
-                                                    <Button
-                                                        mode="outlined"
-                                                        onPress={() => setMenuVisible(true)}
-                                                        style={styles.unitButton}
-                                                        icon="chevron-down"
-                                                    >
-                                                        {unit || 'Select Unit'}
-                                                    </Button>
-                                                }
+                        {/* <NativeViewGestureHandler> */}
+                        <ScrollView
+                            contentContainerStyle={styles.scrollContainer}
+                            showsHorizontalScrollIndicator={false}
+                            showsVerticalScrollIndicator={false}
+                        >
+                            {/* <Title style={styles.header}>New List</Title> */}
+                            <Card style={styles.card}>
+                                <Card.Content>
+                                    <Text style={styles.label}>Goal: {<RedStar />}</Text>
+                                    <PaperTextInput
+                                        style={styles.input}
+                                        value={goalName}
+                                        onChangeText={setGoalName}
+                                        placeholder="your goal here..."
+                                        mode="outlined"
+                                    />
+                                    <Divider />
+                                    <Divider />
+                                    <View style={styles.datepickerContainer}>
+                                        <View style={{ marginRight: "auto" }}>
+                                            <Text style={styles.label}>From: {<RedStar />}</Text>
+                                            <Button
+                                                mode="contained-tonal"
+                                                onPress={() => setShowFromDatePicker(true)}
+                                                icon="calendar"
+                                                style={styles.dateButton}
                                             >
-                                                {units.map((unitItem, index) => (
-                                                    <Menu.Item key={index} onPress={() => { setUnit(unitItem); setMenuVisible(false); }} title={unitItem} />
-                                                ))}
-                                                <Menu.Item onPress={() => { setAddingNewUnit(true); setMenuVisible(false); }} title="Add New Unit" />
-                                            </Menu>
-                                        )}
-                                        {addingNewUnit && (
-                                            <View style={styles.newUnitContainer}>
-                                                <PaperTextInput
-                                                    style={styles.input}
-                                                    value={newUnit}
-                                                    onChangeText={setNewUnit}
-                                                    placeholder="Enter new unit"
-                                                    mode="outlined"
+                                                {moment(fromDate).format("MMM Do YY")}
+                                            </Button>
+                                            {showFromDatePicker && (
+                                                <DateTimePicker
+                                                    value={fromDate}
+                                                    mode="date"
+                                                    display="default"
+                                                    onChange={(event, selectedDate) => {
+                                                        const currentDate = selectedDate || fromDate;
+                                                        setShowFromDatePicker(false);
+                                                        setFromDate(currentDate);
+                                                    }}
                                                 />
-                                                <Button mode="contained" onPress={addNewUnit} style={styles.addUnitButton}>
-                                                    Add Unit
-                                                </Button>
+                                            )}
+                                        </View>
+                                        <View style={{ marginLeft: "auto" }}>
+                                            <Text style={styles.label}>To: {<RedStar />}</Text>
+                                            <Button
+                                                mode="contained-tonal"
+                                                onPress={() => setShowToDatePicker(true)}
+                                                icon="calendar"
+                                                style={styles.dateButton}
+                                            >
+                                                {moment(toDate).format("MMM Do YY")}
+                                            </Button>
+                                            {showToDatePicker && (
+                                                <DateTimePicker
+                                                    value={toDate}
+                                                    mode="date"
+                                                    display="default"
+                                                    onChange={(event, selectedDate) => {
+                                                        const currentDate = selectedDate || toDate;
+                                                        setShowToDatePicker(false);
+                                                        setToDate(currentDate);
+                                                    }}
+                                                />
+                                            )}
+                                        </View>
+                                    </View>
+                                    <Divider />
+                                    <Divider />
+
+                                    <Text style={styles.label}>Task</Text>
+                                    <PaperTextInput
+                                        style={styles.input}
+                                        value={task}
+                                        onChangeText={setTask}
+                                        placeholder="Enter task name.."
+                                        mode="outlined"
+                                    />
+
+                                    <Text style={styles.unitLabel}>Unit</Text>
+                                    <CustomDropDownPicker
+                                        unitValue={(unit) => setUnitValue(unit)}
+                                    />
+
+                                    <Text style={styles.label}>Count of Task:</Text>
+                                    <PaperTextInput
+                                        style={styles.input}
+                                        value={countOfTask.toString()}
+                                        onChangeText={setCountOfTask}
+                                        placeholder="enter task count.."
+                                        mode="outlined"
+                                        keyboardType='numeric'
+                                    />
+
+                                    <Button mode="contained-tonal" onPress={addTask} style={styles.addButton}>
+                                        Add Task
+                                    </Button>
+                                    {/* <FlatList
+                                        data={tasks}
+                                        renderItem={({ item }) => (
+                                            <View style={styles.taskContainer}>
+                                                <Text>{item.taskname}</Text>
+                                                <Text>{item.value}</Text>
+                                                <Text>{item.system_defined_unit}</Text>
+                                                <IconButton icon="delete" onPress={() => {
+                                                    const newTasks = tasks.filter(taskItem => taskItem !== item);
+                                                    setTasks(newTasks);
+                                                }} />
                                             </View>
                                         )}
+                                        keyExtractor={(item, index) => index.toString()}
+                                    /> */}
 
-
-                                        <Button mode="contained-tonal" onPress={addTask} style={styles.addButton}>
-                                            Add Task
-                                        </Button>
-                                        <FlatList
-                                            data={tasks}
-                                            renderItem={({ item }) => (
-                                                <View style={styles.taskContainer}>
-                                                    <Text>{item.taskname}</Text>
-                                                    <Text>{item.value}</Text>
-                                                    <Text>{item.system_defined_unit}</Text>
-                                                    <IconButton icon="delete" onPress={() => {
-                                                        const newTasks = tasks.filter(taskItem => taskItem !== item);
-                                                        setTasks(newTasks);
-                                                    }} />
-                                                </View>
-                                            )}
-                                            keyExtractor={(item, index) => index.toString()}
-                                        />
-                                    </Card.Content>
-                                </Card>
-                                <Button mode="contained" onPress={onSave} style={styles.saveButton}>
-                                    Save List
-                                </Button>
-                            </ScrollView>
-                        </NativeViewGestureHandler>
+                                    {tasks?.map((item) => {
+                                        return (
+                                            <View style={styles.taskContainer} key={item.index}>
+                                                <Text>{item.taskname}</Text>
+                                                <Text>{item.value}</Text>
+                                                <Text>{item.system_defined_unit}</Text>
+                                                <IconButton icon="delete" onPress={() => {
+                                                    const newTasks = tasks.filter(taskItem => taskItem !== item);
+                                                    setTasks(newTasks);
+                                                }} />
+                                            </View>
+                                        )
+                                    })}
+                                </Card.Content>
+                            </Card>
+                            <Button mode="contained" onPress={onSave} style={styles.saveButton}>
+                                Save List
+                            </Button>
+                        </ScrollView>
+                        {/* </NativeViewGestureHandler> */}
                     </KeyboardAvoidingView>
                 </TouchableWithoutFeedback>
             </GestureHandlerRootView>
@@ -237,6 +227,13 @@ const styles = StyleSheet.create({
     },
     scrollContainer: {
         // padding: 20,
+    },
+    datepickerContainer: {
+        flexDirection: "row",
+        justifyContent: "space-around",
+    },
+    dropdown: {
+        marginBottom: 10
     },
     header: {
         fontSize: 24,
@@ -252,6 +249,10 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 16,
         marginVertical: 10,
+    },
+    unitLabel: {
+        fontSize: 16,
+        marginBottom: 5
     },
     input: {
         marginBottom: 20,
@@ -275,6 +276,7 @@ const styles = StyleSheet.create({
     addButton: {
         marginTop: 20,
         marginBottom: 20,
+        borderRadius: 5,
     },
     taskContainer: {
         flexDirection: 'row',
@@ -285,7 +287,8 @@ const styles = StyleSheet.create({
         borderBottomColor: '#ccc',
     },
     saveButton: {
-        marginTop: 20,
+        marginTop: 10,
+        borderRadius: 5,
     },
 });
 

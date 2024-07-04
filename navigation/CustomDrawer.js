@@ -9,7 +9,6 @@ const CustomDrawer = (props) => {
     const { authState, clearLoginDetails } = useAuth();
     const { status, token, username, email, userId } = authState;
 
-    console.log(status)
     return (
         <ScrollView style={{ marginBottom: 20 }}>
             <View style={styles.userInfoContainer}>

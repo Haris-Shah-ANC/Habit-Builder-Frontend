@@ -20,7 +20,8 @@ const Login = (props) => {
     }
 
     const signInWithGoogle = () => {
-        Linking.openURL(`${HOST}/accounts/`)
+        // Linking.openURL(`${HOST}/accounts/`)
+        Linking.openURL(`${HOST}/api/google-oauth2/login/raw/callback/?code=4%2F0ATx3LY6v9KwOz5dKQFeN8_1DBV1vkbEjS5ZhB8ZEtZDWLhrnkmI6nnCHyAx1tiIvsXriPA&scope=email+profile+openid+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&authuser=0&prompt=consent`)
     }
 
     const onSubmitHandler = () => {
