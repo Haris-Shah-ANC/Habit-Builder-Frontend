@@ -46,7 +46,7 @@ const CreateUpdateGoal = ({ navigation }) => {
             enddate: enddate,
             tasks: tasks
         }
-        console.log("payloadData", tasks);
+        // console.log("payloadData", payloadData);
         // console.log({ goalName, fromDate, toDate, tasks, countOfTask });
 
         createGoal(payloadData)

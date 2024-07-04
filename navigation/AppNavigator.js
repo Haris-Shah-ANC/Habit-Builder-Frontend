@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import HomePage from '../screens/HomePage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -8,9 +8,10 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import Login from '../screens/Authentication/Login';
 import Signup from '../screens/Authentication/Signup';
 import { customTheme } from '../utilities/theme';
-import { getLoginStatus, getToken } from '../config/storageCOnfig,';
 import IndividualGoal, { IndividualGoalScreenOptions } from '../screens/Goals/IndividualGoal';
-import { fetchToken } from '../utilities/utils';
+import { useAuth } from '../screens/Authentication/AuthProvider';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import CustomDrawer from './CustomDrawer';
 
 const defaultNavOptions = {
   headerStyle: {
@@ -27,28 +28,29 @@ const defaultNavOptions = {
 const Stack = createNativeStackNavigator();
 
 export const AppNavigator = () => {
-
-  const [loginStatus, setLoginStatus] = React.useState(null);
-
-  const checkLoginStatus = async () => {
-    const isLoggedIn = await getToken();
-    // console.log("loginStatus", isLoggedIn);
-    setLoginStatus(isLoggedIn)
-  }
-
-  React.useEffect(() => {
-    checkLoginStatus()
-  }, [])
-  // console.log("loginStatus", loginStatus);
+  const { authState, clearLoginDetails } = useAuth();
+  const { status, token } = authState;
 
   return (
-    <Stack.Navigator >
-      <Stack.Screen name="All Goals" component={loginStatus ? HomePage : Login} />
-      <Stack.Screen name="Add Goal" component={CreateUpdateGoal} />
-      <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="Signup" component={Signup} />
-      <Stack.Screen name="Goal" component={IndividualGoal} />
-    </Stack.Navigator>
+    <GestureHandlerRootView>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={defaultNavOptions}>
+          {status === "true" ? (
+            <>
+              <Stack.Screen name="Home Pages" component={DrawerNavigator} options={{ headerShown: false }} />
+              <Stack.Screen name="All Goals" component={HomePage} />
+              <Stack.Screen name="Add Goal" component={CreateUpdateGoal} />
+              <Stack.Screen name="Goal" component={IndividualGoal} />
+            </>
+          ) : (
+            <>
+              <Stack.Screen name="Login" component={Login} />
+              <Stack.Screen name="Signup" component={Signup} />
+            </>
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </GestureHandlerRootView>
   );
 };
 
@@ -56,13 +58,21 @@ const Drawer = createDrawerNavigator();
 
 const DrawerNavigator = () => {
   return (
-    <NavigationContainer>
-      <Drawer.Navigator initialRouteName="All Goals" screenOptions={defaultNavOptions}>
-        <Drawer.Screen name="Home" component={AppNavigator} />
-        <Drawer.Screen name="Login" component={Login} />
-        <Drawer.Screen name="Signup" component={Signup} />
-      </Drawer.Navigator>
-    </NavigationContainer>
+    <Drawer.Navigator screenOptions={defaultNavOptions}
+      drawerContent={(props) => {
+        return (
+          <View style={{ flex: 1 }}>
+            <SafeAreaView forceInset={{ top: "always", horizontal: "never" }}>
+              <CustomDrawer />
+            </SafeAreaView>
+          </View>
+        )
+      }}
+    >
+      <Drawer.Screen name="Home Page" component={HomePage} />
+      {/* <Drawer.Screen name="Login" component={Login} /> */}
+      {/* <Drawer.Screen name="Signup" component={Signup} /> */}
+    </Drawer.Navigator>
   )
 }
 

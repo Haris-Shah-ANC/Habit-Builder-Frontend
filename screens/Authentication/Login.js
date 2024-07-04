@@ -6,12 +6,13 @@ import { useState } from "react";
 import { GoogleLogo } from "../../utilities/HeaderButtons";
 import { loginUser } from "./authNetworkCalls";
 import { fillLoginDetails, setLoginStatus, setToken, setUserEmail, setUserId, setUsername } from "../../config/storageCOnfig,";
-
+import { useAuth } from "./AuthProvider";
 
 const Login = (props) => {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const { setAuthState, fillLoginDetails } = useAuth();
 
     const clearFromData = () => {
         setEmail("");
@@ -30,7 +31,7 @@ const Login = (props) => {
         }
         loginUser(payloadData)
             .then((res) => {
-                console.log("res", res.data)
+                // console.log("res", res.data)
                 if (!res.data.access) {
                     Alert.alert("Login Failed", res.data.status ? res.data.status : "Please try again", [
                         {
@@ -49,7 +50,16 @@ const Login = (props) => {
                     setUserId(res.data.user.pk);
                     fillLoginDetails();
                     // clearFromData();
-                    props.navigation.navigate('All Goals');
+
+                    setAuthState({
+                        token: res.data.access,
+                        status: 'true',
+                        username: res.data.user.first_name,
+                        email: res.data.user.email,
+                        userId: res.data.user.pk
+                    })
+
+                    // props.navigation.navigate('All Goals');
                 }
             })
             .catch((err) => {
