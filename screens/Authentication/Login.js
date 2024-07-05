@@ -2,27 +2,88 @@ import { Alert, KeyboardAvoidingView, Linking, StyleSheet, Text, TouchableOpacit
 import { Button, Card, Provider, TextInput as PaperTextInput } from "react-native-paper";
 import { HOST } from "../../config/config";
 import { FlatList, ScrollView } from "react-native-gesture-handler";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GoogleLogo } from "../../utilities/HeaderButtons";
 import { loginUser } from "./authNetworkCalls";
 import { fillLoginDetails, setLoginStatus, setToken, setUserEmail, setUserId, setUsername } from "../../config/storageCOnfig,";
 import { useAuth } from "./AuthProvider";
+import * as Google from 'expo-auth-session/providers/google';
+import * as WebBrowser from 'expo-web-browser';
+import googleConfig from "../../config/google-config";
+import { makeRedirectUri } from 'expo-auth-session';
+import { useRoute } from '@react-navigation/native';
 
 const Login = (props) => {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const { setAuthState, fillLoginDetails } = useAuth();
+    const route = useRoute();
 
     const clearFromData = () => {
         setEmail("");
         setPassword("");
     }
 
-    const signInWithGoogle = () => {
-        // Linking.openURL(`${HOST}/accounts/`)
-        Linking.openURL(`${HOST}/api/google-oauth2/login/raw/callback/?code=4%2F0ATx3LY6v9KwOz5dKQFeN8_1DBV1vkbEjS5ZhB8ZEtZDWLhrnkmI6nnCHyAx1tiIvsXriPA&scope=email+profile+openid+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&authuser=0&prompt=consent`)
+
+    const signInWithGoogle = async () => {
+        // const supported = await Linking.canOpenURL(`${HOST}/google-login/`);
+
+        // console.log("supported", supported)
+        // if (supported) {
+        //     const result = await Linking.openURL(`${HOST}/google-login/`)
+        //     console.log("Google Login Result:", result);
+        //     const code = route.params?.code;
+        //     console.log("Route:", route);
+        // } else {
+        //     Alert.alert(`Some Error Occured while opening the url: ${url}`);
+        // }
+
+
+        try {
+            const result = await promptAsync();
+            console.log('Auth URL:', result); // Log the URL
+            if (result.type === 'success') {
+                // The URL is in result.url to send it to backend
+                console.log('Authentication successful');
+                // Handle the successful authentication
+            } else {
+                console.log('Google Sign In was canceled or failed');
+            }
+        } catch (error) {
+            console.error('Error during Google Sign In:', error);
+        }
     }
+
+
+    const [request, response, promptAsync] = Google.useAuthRequest({
+        androidClientId: googleConfig.androidClientId,
+        expoClientId: googleConfig.clientId,
+        // androidClientId: "",
+        // scopes: googleConfig.scopes,
+        // authorizationEndpoint: `${HOST}/google-login/`,
+        // redirectUri: makeRedirectUri({
+        //     useProxy: true,
+        // }),
+    });
+
+
+    const sendCodeToBackend = async (code) => {
+        try {
+            const response = await fetch(`${HOST}/auth/google/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ code }),
+            });
+            const data = await response.json();
+            console.log("Backend response:", data);
+            // Handle the authentication result here (e.g., save token, update state)
+        } catch (error) {
+            console.error("Error sending code to backend:", error);
+        }
+    };
 
     const onSubmitHandler = () => {
         payloadData = {
