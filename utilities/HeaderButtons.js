@@ -19,7 +19,7 @@ export const AddNewGoalButton = (props) => {
             title="AddNewGoal"
             iconName="add-circle-outline"
             onPress={props.onPressHandler}
-            color='black'
+            color='white'
             size={30}
         />
     )

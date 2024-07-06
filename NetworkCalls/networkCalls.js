@@ -3,8 +3,7 @@ import axios from "axios";
 import { fetchToken } from "../utilities/utils";
 
 export const createGoal = async (payloadData) => {
-    // let token = await fetchToken();
-    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI0NDkyOTg0LCJpYXQiOjE3MTkzMDg5ODQsImp0aSI6IjNjM2IwZTkwMDhlODQwZWU5MjFhODBhZGJhNDA5YzZiIiwidXNlcl9pZCI6NzR9.Tev6jzYS8WaLniMmrEf8PbEIk44BNyyK1NI7jqgiItg"
+    let token = await fetchToken();
 
     return new Promise((resolve, reject) => {
         axios.post(`${HOST}/createplan/`, payloadData,
@@ -23,9 +22,9 @@ export const createGoal = async (payloadData) => {
 }
 
 export const fetchAllGoals = async () => {
-    // let token = await fetchToken();
-    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI0NDkyOTg0LCJpYXQiOjE3MTkzMDg5ODQsImp0aSI6IjNjM2IwZTkwMDhlODQwZWU5MjFhODBhZGJhNDA5YzZiIiwidXNlcl9pZCI6NzR9.Tev6jzYS8WaLniMmrEf8PbEIk44BNyyK1NI7jqgiItg"
 
+    let token = await fetchToken();
+    console.log("fetchAllGoals", token)
     return new Promise((resolve, reject) => {
 
         axios.get(`${HOST}/userplans/`, {
@@ -43,8 +42,7 @@ export const fetchAllGoals = async () => {
 }
 
 export const updateGoal = async (payloadData, goalId) => {
-    // let token = await fetchToken();
-    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI0NDkyOTg0LCJpYXQiOjE3MTkzMDg5ODQsImp0aSI6IjNjM2IwZTkwMDhlODQwZWU5MjFhODBhZGJhNDA5YzZiIiwidXNlcl9pZCI6NzR9.Tev6jzYS8WaLniMmrEf8PbEIk44BNyyK1NI7jqgiItg"
+    let token = await fetchToken();
 
     return new Promise((resolve, reject) => {
         axios.put(`${HOST}/habitapp/topic/${goalId}/`, payloadData,
@@ -63,8 +61,7 @@ export const updateGoal = async (payloadData, goalId) => {
 }
 
 export const fetchAllSubGoals = async (goalId) => {
-    // let token = await fetchToken();
-    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI0NDkyOTg0LCJpYXQiOjE3MTkzMDg5ODQsImp0aSI6IjNjM2IwZTkwMDhlODQwZWU5MjFhODBhZGJhNDA5YzZiIiwidXNlcl9pZCI6NzR9.Tev6jzYS8WaLniMmrEf8PbEIk44BNyyK1NI7jqgiItg"
+    let token = await fetchToken();
 
     return new Promise((resolve, reject) => {
 
@@ -83,8 +80,7 @@ export const fetchAllSubGoals = async (goalId) => {
 }
 
 export const deleteSpecificGoal = async (goalId) => {
-    // let token = await fetchToken();
-    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI0NDkyOTg0LCJpYXQiOjE3MTkzMDg5ODQsImp0aSI6IjNjM2IwZTkwMDhlODQwZWU5MjFhODBhZGJhNDA5YzZiIiwidXNlcl9pZCI6NzR9.Tev6jzYS8WaLniMmrEf8PbEIk44BNyyK1NI7jqgiItg"
+    let token = await fetchToken();
 
     return new Promise((resolve, reject) => {
         axios.delete(`${HOST}/habitapp/topic/${goalId}/`, {
@@ -102,8 +98,7 @@ export const deleteSpecificGoal = async (goalId) => {
 }
 
 export const deleteSpecificSubGoal = async (subGoalId) => {
-    // let token = await fetchToken();
-    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI0NDkyOTg0LCJpYXQiOjE3MTkzMDg5ODQsImp0aSI6IjNjM2IwZTkwMDhlODQwZWU5MjFhODBhZGJhNDA5YzZiIiwidXNlcl9pZCI6NzR9.Tev6jzYS8WaLniMmrEf8PbEIk44BNyyK1NI7jqgiItg"
+    let token = await fetchToken();
 
     return new Promise((resolve, reject) => {
         axios.delete(`${HOST}/delete-task/?taskid=${subGoalId}`, {
@@ -121,8 +116,7 @@ export const deleteSpecificSubGoal = async (subGoalId) => {
 }
 
 export const addNewSubGoal = async (payloadData) => {
-    // let token = await fetchToken();
-    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI0NDkyOTg0LCJpYXQiOjE3MTkzMDg5ODQsImp0aSI6IjNjM2IwZTkwMDhlODQwZWU5MjFhODBhZGJhNDA5YzZiIiwidXNlcl9pZCI6NzR9.Tev6jzYS8WaLniMmrEf8PbEIk44BNyyK1NI7jqgiItg"
+    let token = await fetchToken();
 
     return new Promise((resolve, reject) => {
         axios.post(`${HOST}/new-task/`, payloadData, {
@@ -140,8 +134,7 @@ export const addNewSubGoal = async (payloadData) => {
 }
 
 export const updateSubGoal = async (payloadData, subGoalId) => {
-    // let token = await fetchToken();
-    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI0NDkyOTg0LCJpYXQiOjE3MTkzMDg5ODQsImp0aSI6IjNjM2IwZTkwMDhlODQwZWU5MjFhODBhZGJhNDA5YzZiIiwidXNlcl9pZCI6NzR9.Tev6jzYS8WaLniMmrEf8PbEIk44BNyyK1NI7jqgiItg"
+    let token = await fetchToken();
 
     return new Promise((resolve, reject) => {
         axios.put(`${HOST}/update-task/?taskid=${subGoalId}`, payloadData, {
@@ -160,9 +153,7 @@ export const updateSubGoal = async (payloadData, subGoalId) => {
 }
 
 export const incrementSubGoalCount = async (payloadData, subGoalId) => {
-    // let token = await fetchToken();
-    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI0NDkyOTg0LCJpYXQiOjE3MTkzMDg5ODQsImp0aSI6IjNjM2IwZTkwMDhlODQwZWU5MjFhODBhZGJhNDA5YzZiIiwidXNlcl9pZCI6NzR9.Tev6jzYS8WaLniMmrEf8PbEIk44BNyyK1NI7jqgiItg"
-
+    let token = await fetchToken();
     return new Promise((resolve, reject) => {
         axios.post(`${HOST}/new-timestamp/?taskid=${subGoalId}`, payloadData,
             {
@@ -180,8 +171,7 @@ export const incrementSubGoalCount = async (payloadData, subGoalId) => {
 }
 
 export const getAllTimeStamps = async (subGoalId) => {
-    // let token = await fetchToken();
-    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI0NDkyOTg0LCJpYXQiOjE3MTkzMDg5ODQsImp0aSI6IjNjM2IwZTkwMDhlODQwZWU5MjFhODBhZGJhNDA5YzZiIiwidXNlcl9pZCI6NzR9.Tev6jzYS8WaLniMmrEf8PbEIk44BNyyK1NI7jqgiItg"
+    let token = await fetchToken();
 
     return new Promise((resolve, reject) => {
 
@@ -200,8 +190,7 @@ export const getAllTimeStamps = async (subGoalId) => {
 }
 
 export const deleteTimeStamp = async (timeStampId) => {
-    // let token = await fetchToken();
-    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI0NDkyOTg0LCJpYXQiOjE3MTkzMDg5ODQsImp0aSI6IjNjM2IwZTkwMDhlODQwZWU5MjFhODBhZGJhNDA5YzZiIiwidXNlcl9pZCI6NzR9.Tev6jzYS8WaLniMmrEf8PbEIk44BNyyK1NI7jqgiItg"
+    let token = await fetchToken();
 
     return new Promise((resolve, reject) => {
         axios.delete(`${HOST}/delete-timestamp/?id=${timeStampId}`, {
@@ -219,8 +208,7 @@ export const deleteTimeStamp = async (timeStampId) => {
 }
 
 export const fetchUserDefinedUnits = async () => {
-    // let token = await fetchToken();
-    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI0NDkyOTg0LCJpYXQiOjE3MTkzMDg5ODQsImp0aSI6IjNjM2IwZTkwMDhlODQwZWU5MjFhODBhZGJhNDA5YzZiIiwidXNlcl9pZCI6NzR9.Tev6jzYS8WaLniMmrEf8PbEIk44BNyyK1NI7jqgiItg"
+    let token = await fetchToken();
 
     return new Promise((resolve, reject) => {
         axios.get(`${HOST}/habitapp/userdefinedunits/`, {
@@ -238,8 +226,7 @@ export const fetchUserDefinedUnits = async () => {
 }
 
 export const createNewUnit = async (payloadData) => {
-    // let token = await fetchToken();
-    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI0NDkyOTg0LCJpYXQiOjE3MTkzMDg5ODQsImp0aSI6IjNjM2IwZTkwMDhlODQwZWU5MjFhODBhZGJhNDA5YzZiIiwidXNlcl9pZCI6NzR9.Tev6jzYS8WaLniMmrEf8PbEIk44BNyyK1NI7jqgiItg"
+    let token = await fetchToken();
 
     return new Promise((resolve, reject) => {
         axios.post(`${HOST}/habitapp/userdefinedunits/`, payloadData, {
@@ -247,6 +234,28 @@ export const createNewUnit = async (payloadData) => {
                 "Authorization": `Bearer ${token}`
             }
         })
+            .then((res) => {
+                resolve(res);
+            })
+            .catch((err) => {
+                reject(err);
+            })
+    })
+}
+
+export const recreateGoalNewTimeline = async (payloadData) => {
+    // let token = await fetchToken();
+    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI1NDU1NDIyLCJpYXQiOjE3MjAyNzE0MjIsImp0aSI6ImZiMTIxODc2YTkyZTQ4OGI5MTY3YWE1MWQxM2NkZjczIiwidXNlcl9pZCI6NzR9.HPz-XgpDyJbi41qyO7ny0jsX-iJn1Ryp_xoyM6RoSW8"
+
+    console.log("API CALL", token)
+
+    return new Promise((resolve, reject) => {
+        axios.post(`${HOST}/renew-plan/`, payloadData,
+            {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            })
             .then((res) => {
                 resolve(res);
             })

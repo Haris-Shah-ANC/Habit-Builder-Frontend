@@ -121,6 +121,7 @@ const CreateUpdateGoal = ({ navigation }) => {
                                                         setShowFromDatePicker(false);
                                                         setFromDate(currentDate);
                                                     }}
+                                                    minimumDate={new Date()}
                                                 />
                                             )}
                                         </View>
@@ -144,6 +145,7 @@ const CreateUpdateGoal = ({ navigation }) => {
                                                         setShowToDatePicker(false);
                                                         setToDate(currentDate);
                                                     }}
+                                                    minimumDate={fromDate}
                                                 />
                                             )}
                                         </View>

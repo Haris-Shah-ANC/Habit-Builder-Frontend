@@ -34,7 +34,7 @@ export const CustomDropDownPicker = (props) => {
         fetchUserDefinedUnits()
             .then((res) => {
                 let result = res.data;
-                console.log(result)
+                // console.log("result",result);
                 setUnitList([{ label: 'Add New Unit', value: 'add_new' }, ...result.data])
                 hasFeatchedUnits.current = true;
             })

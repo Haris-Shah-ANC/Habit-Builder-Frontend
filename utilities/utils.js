@@ -8,7 +8,7 @@ export const RedStar = () => {
 
 export const fetchToken = async () => {
     let token = await getToken();
-    console.log("token", token);
+    // console.log("token", token);
     return token
 }
 

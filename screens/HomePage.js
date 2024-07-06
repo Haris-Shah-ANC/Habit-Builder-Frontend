@@ -1,28 +1,27 @@
 import * as React from 'react';
 import { View, StyleSheet, TouchableOpacity, Alert } from "react-native";
-import { Ionicons } from '@expo/vector-icons';
-import { HeaderButtons, Item } from "react-navigation-header-buttons";
-import CustomHeaderButton, { AddNewGoalButton, DeleteLogo } from '../utilities/HeaderButtons';
-import { getLoginStatus } from '../config/storageCOnfig,';
-import Login from './Authentication/Login';
+import { HeaderButtons,  } from "react-navigation-header-buttons";
+import CustomHeaderButton, { AddNewGoalButton, } from '../utilities/HeaderButtons';
 import { Button, Card, Provider, Text } from 'react-native-paper';
 import { deleteSpecificGoal, fetchAllGoals } from '../NetworkCalls/networkCalls';
 import { ScrollView } from 'react-native-virtualized-view';
 import moment from 'moment/moment';
 import { useIsFocused } from '@react-navigation/native';
 import { CenterText } from '../utilities/utils';
-import EditGoal from './Goals/EditGoal';
+import EditRecreateGoal from './Goals/EditRecreateGoal';
+import Spinner from '../utilities/Spinner';
+import { useAuth } from './Authentication/AuthProvider';
+
 
 const HomePage = ({ route, navigation }) => {
 
-    const [loginStatus, setLoginStatus] = React.useState(null);
-    const isFocused = useIsFocused();
+    const isScreenFocused = useIsFocused();
 
-    const [goalsList, setGoalsList] = React.useState(
-        [{ "created_at": "2024-06-25T10:11:53.313796Z", "duration_days": 44, "end_date": "2024-07-15", "id": 51, "is_completed": false, "modified_at": "2024-06-25T10:11:53.327026Z", "start_date": "2024-06-01", "tasks": [[Object], [Object], [Object], [Object], [Object], [Object]], "topic_name": "improve vocabulary", "user_id_id": 74 }, { "created_at": "2024-06-26T14:03:34.233475Z", "duration_days": 136, "end_date": "2024-10-15", "id": 75, "is_completed": false, "modified_at": "2024-06-26T14:03:34.246705Z", "start_date": "2024-06-01", "tasks": [[Object], [Object], [Object], [Object], [Object], [Object]], "topic_name": "Healthy Diet", "user_id_id": 74 }, { "created_at": "2024-06-26T14:22:33.860446Z", "duration_days": 136, "end_date": "2024-10-15", "id": 76, "is_completed": false, "modified_at": "2024-06-26T14:22:33.875656Z", "start_date": "2024-06-01", "tasks": [], "topic_name": "Healthy Diet", "user_id_id": 74 }, { "created_at": "2024-06-26T14:22:34.714685Z", "duration_days": 136, "end_date": "2024-10-15", "id": 77, "is_completed": false, "modified_at": "2024-06-26T14:22:34.727156Z", "start_date": "2024-06-01", "tasks": [], "topic_name": "Healthy Diet", "user_id_id": 74 }, { "created_at": "2024-06-26T14:22:35.535821Z", "duration_days": 136, "end_date": "2024-10-15", "id": 78, "is_completed": false, "modified_at": "2024-06-26T14:22:35.548575Z", "start_date": "2024-06-01", "tasks": [], "topic_name": "Healthy Diet", "user_id_id": 74 }]
-    );
+    const [goalsList, setGoalsList] = React.useState(null);
+    const [spinner, setSpinner] = React.useState(true);
 
-    const title = route.params;
+    const { authState } = useAuth();
+    const { token } = authState;
 
     React.useEffect(() => {
         navigation.setOptions({
@@ -39,14 +38,18 @@ const HomePage = ({ route, navigation }) => {
     })
 
     const fetchGoalsList = () => {
-        fetchAllGoals()
+        console.log("fetchGoalsList")
+        setSpinner(true);
+        fetchAllGoals(token)
             .then((res) => {
                 let result = res.data.data.topics;
-                // console.log("result", result);
+                console.log("result", result);
                 setGoalsList(result);
+                setSpinner(false);
             })
             .catch((err) => {
                 console.log("Error while fetching Goal list", err);
+                setSpinner(false);
             })
     }
 
@@ -80,10 +83,10 @@ const HomePage = ({ route, navigation }) => {
     }
 
     React.useEffect(() => {
-        if (isFocused) {
+        if (token) {
             fetchGoalsList()
         }
-    }, [isFocused])
+    }, [isScreenFocused,token])
 
     // const checkLoginStatus = async () => {
     //     const isLoggedIn = await getLoginStatus();
@@ -101,7 +104,9 @@ const HomePage = ({ route, navigation }) => {
 
     return (
         <>
-            {(goalsList && goalsList.length > 0) ?
+            {spinner ? (
+                <Spinner />
+            ) : (goalsList && goalsList.length > 0) ?
                 (
                     <ScrollView>
                         {goalsList?.map(goal => (
@@ -127,16 +132,18 @@ const CardView = (props) => {
 
     let created_at = moment(props.goal.created_at)
     let start_date = moment(props.goal.start_date)
-
+    let end_date = moment(props.goal.end_date)
     let goalData = props.goal
-    // console.log("goalData", goalData)
     const [editableGoalId, setEditableGoalId] = React.useState(null);
+    const [actionType, setActionType] = React.useState("edit");
+    const isExpired = end_date.isBefore(moment());
+
+    // console.log("goalData:", goalData?.is_archieved);
 
     return (
         <Provider >
-            {editableGoalId !== goalData.id ?
-
-                <Card style={styles.cardContainer} >
+            {editableGoalId !== goalData.id ? (
+                <Card style={[styles.cardContainer, isExpired && styles.expiredCard]}>
                     <TouchableOpacity
                         onPress={() => {
                             props.navigation.navigate("Goal", {
@@ -148,37 +155,57 @@ const CardView = (props) => {
                             <Card.Title title={props.goal.topic_name} style={{ marginRight: "auto" }} />
                         </View>
                         <Card.Content style={styles.cardContent}>
-                            <Text variant="bodyLarge" style={{ marginRight: "auto" }}>
-                                {start_date.format('DD MMM YYYY')}
+                            <Text variant="bodyLarge" style={{ marginRight: "auto", color: isExpired && "red" }}>
+                                {end_date.format('DD MMM YYYY')}
                             </Text>
-                            <Text variant="bodyLarge" style={{ marginLeft: "auto" }}>
-                                {created_at.fromNow()}
+                            <Text variant="bodyLarge" style={{ marginLeft: "auto", color: isExpired && "red" }}>
+                                {isExpired ? "Deadline Expired" : created_at.fromNow()}
                             </Text>
                         </Card.Content>
                     </TouchableOpacity>
-                    <Card.Actions style={styles.cardFooter}>
-                        <Button style={styles.editBtn} onPress={() => setEditableGoalId(goalData.id)}>Edit</Button>
-                        <Button style={styles.deleteBtn} onPress={() => Alert.alert("Are you sure you want delete this Goal?", "Press cancel to go back", [
-                            {
-                                text: "Cancel   ",
-                                onPress: () => { },
-                            },
-                            {
-                                text: "Delete",
-                                onPress: () => { props.handleDelete(goalData.id) },
-                            },
-                        ])}>
-                            Delete
-                        </Button>
-                    </Card.Actions>
+                    {(isExpired && !goalData.is_archieved) ? (
+                        <Card.Actions style={styles.cardFooter}>
+                            <Button
+                                style={styles.recreateBtn}
+                                onPress={() => { setEditableGoalId(goalData.id); setActionType("recreate") }}
+                            >
+                                Recreate Timeline
+                            </Button>
+                        </Card.Actions>
+                    ) : (
+                        <Card.Actions style={styles.cardFooter}>
+                            <Button
+                                style={styles.editBtn}
+                                onPress={() => { setEditableGoalId(goalData.id); setActionType("edit") }}
+                            >
+                                Edit
+                            </Button>
+                            <Button
+                                style={styles.deleteBtn}
+                                onPress={() => Alert.alert("Are you sure you want delete this Goal?", "Press cancel to go back", [
+                                    {
+                                        text: "Cancel   ",
+                                        onPress: () => { },
+                                    },
+                                    {
+                                        text: "Delete",
+                                        onPress: () => { props.handleDelete(goalData.id) },
+                                    },
+                                ])}
+                            >
+                                Delete
+                            </Button>
+                        </Card.Actions>
+                    )}
                 </Card>
-                : (
-                    <EditGoal
-                        closeEditMode={() => setEditableGoalId(null)}
-                        goalData={goalData}
-                        refreshPage={() => props.refreshPage()}
-                    />
-                )}
+            ) : (
+                <EditRecreateGoal
+                    closeEditMode={() => setEditableGoalId(null)}
+                    goalData={goalData}
+                    refreshPage={() => props.refreshPage()}
+                    actionType={actionType}
+                />
+            )}
         </Provider>
     )
 }
@@ -210,5 +237,17 @@ const styles = StyleSheet.create({
         marginRight: "auto",
         borderRadius: 5,
         backgroundColor: "#dd4b39"
+    },
+    recreateBtn: {
+        marginTop: 10,
+        borderRadius: 5,
+        backgroundColor: "white",
+        marginRight: "20%",
+        alignSelf: "center"
+    },
+    expiredCard: {
+        backgroundColor: "#ffe6e6",
+        borderWidth: 1,
+        borderColor: "#ff6666",
     },
 })

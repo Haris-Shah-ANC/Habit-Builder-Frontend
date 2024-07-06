@@ -3,9 +3,10 @@ import { StyleSheet, Text, View } from 'react-native'
 import { Button, Card, TextInput } from 'react-native-paper';
 import moment from 'moment';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { updateGoal } from '../../NetworkCalls/networkCalls';
+import { recreateGoalNewTimeline, updateGoal } from '../../NetworkCalls/networkCalls';
 
-const EditGoal = (props) => {
+
+const EditRecreateGoal = (props) => {
 
     let goalTitle = props.goalData.topic_name;
     let start_date = props.goalData.start_date;
@@ -18,18 +19,19 @@ const EditGoal = (props) => {
     const [showToDatePicker, setShowToDatePicker] = useState(false);
 
     // console.log("Date", fromDate, toDate);
+    // console.log("actionType:", props.goalData.id);
 
     const udpateGoalData = () => {
-        let start_date = moment(fromDate).format("YYYY-MM-DD")
-        let end_date = moment(toDate).format("YYYY-MM-DD")
+        let startDate = moment(fromDate).format("YYYY-MM-DD")
+        let endDate = moment(toDate).format("YYYY-MM-DD")
         let payloadData = {
             topicname: goalName,
-            startdate: start_date,
-            enddate: end_date
+            startdate: startDate,
+            enddate: endDate
         }
-        let noDataChange = goalName === goalTitle && start_date === fromDate && end_date === toDate;
+        let hasNoDataChanged = goalName === goalTitle && start_date === fromDate && end_date === toDate;
 
-        if (!noDataChange) {
+        if (!hasNoDataChanged) {
             updateGoal(payloadData, props.goalData.id)
                 .then((res) => {
                     let result = res.data;
@@ -42,6 +44,30 @@ const EditGoal = (props) => {
         } else {
             props.closeEditMode(false);
         }
+    }
+
+    const recreateGoal = () => {
+        let startDate = moment(fromDate).format("YYYY-MM-DD")
+        let endDate = moment(toDate).format("YYYY-MM-DD")
+        let payloadData = {
+            topicid: props.goalData.id,
+            topicname: goalName,
+            startdate: startDate,
+            enddate: endDate,
+            tasks: props.goalData.tasks
+        }
+
+        console.log("payloadData:", payloadData);
+        recreateGoalNewTimeline(payloadData)
+            .then((res) => {
+                let result = res.data;
+                console.log("result:", result);
+                props.refreshPage();
+                props.closeEditMode(false);
+            })
+            .catch((err) => {
+                console.log("Error While Recreating Goal with New Timeline", err);
+            })
     }
 
     return (
@@ -76,6 +102,7 @@ const EditGoal = (props) => {
                                     setShowFromDatePicker(false);
                                     setFromDate(currentDate);
                                 }}
+                                maximumDate={new Date(fromDate)}
                             />
                         )}
                     </View>
@@ -99,16 +126,16 @@ const EditGoal = (props) => {
                                     setShowToDatePicker(false);
                                     setToDate(currentDate);
                                 }}
+                                minimumDate={new Date(fromDate)}
                             />
                         )}
                     </View>
-
                 </View>
 
                 <View style={styles.btnContainer}>
                     <Button
                         mode='outlined'
-                        onPress={() => udpateGoalData()}
+                        onPress={() => { props.actionType === "edit" ? udpateGoalData() : recreateGoal() }}
                     >
                         Save
                     </Button>
@@ -124,7 +151,7 @@ const EditGoal = (props) => {
     )
 }
 
-export default EditGoal;
+export default EditRecreateGoal;
 
 const styles = StyleSheet.create({
     container: {
