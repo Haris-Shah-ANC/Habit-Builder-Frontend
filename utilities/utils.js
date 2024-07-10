@@ -16,7 +16,7 @@ export const CenterText = (props) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>
+            <Text style={{ fontSize: 15, fontWeight: "bold", color: props.textColor }}>
                 {props.text}
             </Text>
         </View>
@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         margin: 10,
     },
-    text: {
+    textStyle: {
         fontSize: 15,
         fontWeight: "bold",
     }

@@ -25,72 +25,27 @@ const Login = (props) => {
         setPassword("");
     }
 
-
+    console.log("data in params", props.route)
     const signInWithGoogle = async () => {
-        // const supported = await Linking.canOpenURL(`${HOST}/google-login/`);
+        const supported = await Linking.canOpenURL(`${HOST}/google-login/`);
 
-        // console.log("supported", supported)
-        // if (supported) {
-        //     const result = await Linking.openURL(`${HOST}/google-login/`)
-        //     console.log("Google Login Result:", result);
-        //     const code = route.params?.code;
-        //     console.log("Route:", route);
-        // } else {
-        //     Alert.alert(`Some Error Occured while opening the url: ${url}`);
-        // }
-
-
-        try {
-            const result = await promptAsync();
-            console.log('Auth URL:', result); // Log the URL
-            if (result.type === 'success') {
-                // The URL is in result.url to send it to backend
-                console.log('Authentication successful');
-                // Handle the successful authentication
-            } else {
-                console.log('Google Sign In was canceled or failed');
-            }
-        } catch (error) {
-            console.error('Error during Google Sign In:', error);
+        if (supported) {
+            const result = await Linking.openURL(`${HOST}/google-login/`)
+        } else {
+            Alert.alert(`Some Error Occured while opening the url: ${url}`);
         }
+
     }
 
 
-    const [request, response, promptAsync] = Google.useAuthRequest({
-        androidClientId: googleConfig.androidClientId,
-        expoClientId: googleConfig.clientId,
-        // androidClientId: "",
-        // scopes: googleConfig.scopes,
-        // authorizationEndpoint: `${HOST}/google-login/`,
-        // redirectUri: makeRedirectUri({
-        //     useProxy: true,
-        // }),
-    });
-
-
-    const sendCodeToBackend = async (code) => {
-        try {
-            const response = await fetch(`${HOST}/auth/google/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ code }),
-            });
-            const data = await response.json();
-            console.log("Backend response:", data);
-            // Handle the authentication result here (e.g., save token, update state)
-        } catch (error) {
-            console.error("Error sending code to backend:", error);
-        }
-    };
-
     const onSubmitHandler = () => {
+        console.log("onSubmitHandler")
         payloadData = {
             username: email,
             email: email,
             password: password
         }
+        console.log("Login Payload", payloadData)
         loginUser(payloadData)
             .then((res) => {
                 // console.log("res", res.data)
@@ -106,11 +61,11 @@ const Login = (props) => {
                     console.log("Successfully Logged in!");
 
                     setToken(res.data.access);
-                    setLoginStatus("true");
-                    setUsername(res.data.user.first_name);
-                    setUserEmail(res.data.user.email);
-                    setUserId(res.data.user.pk);
-                    fillLoginDetails();
+                    // setLoginStatus("true");
+                    // setUsername(res.data.user.first_name);
+                    // setUserEmail(res.data.user.email);
+                    // setUserId(res.data.user.pk);
+                    // fillLoginDetails();
                     // clearFromData();
 
                     setAuthState({

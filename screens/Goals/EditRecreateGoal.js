@@ -126,7 +126,7 @@ const EditRecreateGoal = (props) => {
                                     setShowToDatePicker(false);
                                     setToDate(currentDate);
                                 }}
-                                minimumDate={new Date(fromDate)}
+                                // minimumDate={props.actionType === "edit" ? new Date(fromDate) : new Date()}
                             />
                         )}
                     </View>

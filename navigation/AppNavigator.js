@@ -1,5 +1,5 @@
 import React from 'react';
-import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { Linking, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import HomePage from '../screens/HomePage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -31,9 +31,53 @@ export const AppNavigator = () => {
   const { authState, clearLoginDetails } = useAuth();
   const { status, token } = authState;
 
+  const config = {
+    screens: {
+      "Login": {
+        path: `login/`,
+        parse: {
+          token: (token) => token,
+        },
+        stringify: {
+          token: (token) => token,
+        },
+      },
+    },
+  };
+
+  const linking = {
+
+    prefixes: ["http://example.in", "http://example.com", "https://example.com", "https://example.in"],
+    config,
+    // Custom function to get the URL which was used to open the app
+    async getInitialURL() {
+      // First, you would need to get the initial URL from your third-party integration
+      // The exact usage depend on the third-party SDK you use
+      // For example, to get to get the initial URL for Firebase Dynamic Links:
+      // As a fallback, you may want to do the default deep link handling
+      const url = await Linking.getInitialURL();
+      return url;
+    },
+
+    // Custom function to subscribe to incoming links
+    subscribe(listener) {
+
+      // Listen to incoming links from deep linking
+      const linkingSubscription = Linking.addEventListener('url', ({ url }) => {
+        listener(url);
+        //  console.log("Redirect url", url);
+      });
+
+      return () => {
+        // Clean up the event listeners
+        linkingSubscription.remove();
+      };
+    }
+  };
+
   return (
     <GestureHandlerRootView>
-      <NavigationContainer>
+      <NavigationContainer linking={linking}>
         <Stack.Navigator screenOptions={defaultNavOptions}>
           {status === "true" ? (
             <>

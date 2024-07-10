@@ -12,15 +12,16 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { AddNewSubGoal } from './AddNewSubGoal';
 
 const IndividualGoal = (props) => {
-    // console.log("props inside IndividualGoal", props.route.params.goalData.tasks);
+    // console.log("props inside IndividualGoal", props.route.params.goalData);
     const [isModalVisible, setIsModalVisible] = React.useState(false);
     const [timeStampsList, setTimeStampsList] = React.useState(null);
     const [showAddNewTaskWindow, setShowAddNewTaskWindow] = React.useState(false);
-    const goal_id = props.route.params.goalData.id;
+    let [subGoalsList, setSubGoalsList] = React.useState(props.route.params.goalData.tasks)
 
+    const goal_id = props.route.params.goalData.id;
+    const has_deadline_expired = props.route.params.isExpired;
     let startDate = moment(props.route.params.goalData.created_at);
     let endDate = moment(props.route.params.goalData.end_date);
-    let [subGoalsList, setSubGoalsList] = React.useState(props.route.params.goalData.tasks)
 
     React.useEffect(() => {
         props.navigation.setOptions({
@@ -160,6 +161,7 @@ const IndividualGoal = (props) => {
                         timeStampsList={timeStampsList}
                         goalId={goal_id}
                         udpateSubGoalsList={(data) => setSubGoalsList(data)}
+                        has_deadline_expired={has_deadline_expired}
                     />
                 ))}
             </ScrollView>
@@ -188,7 +190,8 @@ const SubGoalView = (props) => {
     let completedTimes = props.subGoalData.completed_value ? props.subGoalData.completed_value : 0
     let unit = props.subGoalData.system_defined_unit ? props.subGoalData.system_defined_unit : props.subGoalData.user_defined_unit
 
-    // console.log("Props inside SubGoalView",props.subGoalData)
+
+    // console.log("Props inside SubGoalView", props.has_deadline_expired)
 
     const showMode = (currentMode) => {
         setIsPickerVisible(true);
@@ -221,27 +224,31 @@ const SubGoalView = (props) => {
                     >
                         <View style={styles.cartTitle}>
                             <Card.Title title={props.subGoalData.taskname} style={{ marginRight: "auto" }} />
-                            <Button
-                                icon={"pen"}
-                                style={{ marginRight: -40 }}
-                                onPress={() => setEditableTaskId(props.subGoalData.id)}
-                            />
+                            {!props.has_deadline_expired &&
+                                <>
+                                    <Button
+                                        icon={"pen"}
+                                        style={{ marginRight: -40 }}
+                                        onPress={() => setEditableTaskId(props.subGoalData.id)}
+                                    />
 
-                            <Button
-                                onPress={() => Alert.alert("Are you sure you want delete this SubGoal?", "Press cancel to go back", [
-                                    {
-                                        text: "Cancel   ",
-                                        onPress: () => { },
-                                    },
-                                    {
-                                        text: "Delete",
-                                        onPress: () => { props.handleDelete(props.subGoalData.id) },
-                                    },
-                                ])}
-                                style={{ marginLeft: 15 }}
-                            >
-                                <DeleteLogo />
-                            </Button>
+                                    <Button
+                                        onPress={() => Alert.alert("Are you sure you want delete this SubGoal?", "Press cancel to go back", [
+                                            {
+                                                text: "Cancel   ",
+                                                onPress: () => { },
+                                            },
+                                            {
+                                                text: "Delete",
+                                                onPress: () => { props.handleDelete(props.subGoalData.id) },
+                                            },
+                                        ])}
+                                        style={{ marginLeft: 15 }}
+                                    >
+                                        <DeleteLogo />
+                                    </Button>
+                                </>
+                            }
                         </View>
                         <Card.Content>
                             <Text style={styles.countText}>
@@ -249,7 +256,7 @@ const SubGoalView = (props) => {
                             </Text>
                         </Card.Content>
                     </TouchableOpacity>
-                    {completedTimes < totalTimes ? (
+                    {completedTimes < totalTimes && !props.has_deadline_expired ? (
                         <Button
                             mode="outlined"
                             style={styles.plusOneButton}
@@ -259,8 +266,10 @@ const SubGoalView = (props) => {
                             +1
                         </Button>
                     ) :
-                        (
+                        !props.has_deadline_expired ? (
                             <CenterText text={"Goal Completed"} />
+                        ) : (
+                            <CenterText text={"Goal Deadline Expired"} textColor={"red"} />
                         )
                     }
                 </Card>
@@ -284,7 +293,7 @@ const SubGoalView = (props) => {
                             </Text>
                         </View>
                         <Divider />
-                        {completedTimes < totalTimes && !showAddWindow ?
+                        {completedTimes < totalTimes && !showAddWindow && !props.has_deadline_expired ?
                             <Button
                                 icon={"plus"}
                                 onPress={() => setShowAddWindow(true)}
@@ -370,19 +379,21 @@ const SubGoalView = (props) => {
                                             <Text style={{ marginRight: "20%", fontWeight: "bold" }}>
                                                 {timeStamp.value}
                                             </Text>
-                                            <Button
-                                                icon={"delete"}
-                                                onPress={() => Alert.alert("Are you sure you want delete this TimeStamp?", "Press cancel to go back", [
-                                                    {
-                                                        text: "Cancel   ",
-                                                        onPress: () => { },
-                                                    },
-                                                    {
-                                                        text: "Delete",
-                                                        onPress: () => { props.handleTimeStampDelete(timeStamp.id, props.subGoalData.id) },
-                                                    },
-                                                ])}
-                                            />
+                                            {!props.has_deadline_expired &&
+                                                <Button
+                                                    icon={"delete"}
+                                                    onPress={() => Alert.alert("Are you sure you want delete this TimeStamp?", "Press cancel to go back", [
+                                                        {
+                                                            text: "Cancel   ",
+                                                            onPress: () => { },
+                                                        },
+                                                        {
+                                                            text: "Delete",
+                                                            onPress: () => { props.handleTimeStampDelete(timeStamp.id, props.subGoalData.id) },
+                                                        },
+                                                    ])}
+                                                />
+                                            }
                                         </>
                                         {/* ) : (
                                             <View >

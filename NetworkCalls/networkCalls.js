@@ -24,7 +24,7 @@ export const createGoal = async (payloadData) => {
 export const fetchAllGoals = async () => {
 
     let token = await fetchToken();
-    console.log("fetchAllGoals", token)
+    // console.log("fetchAllGoals", token)
     return new Promise((resolve, reject) => {
 
         axios.get(`${HOST}/userplans/`, {

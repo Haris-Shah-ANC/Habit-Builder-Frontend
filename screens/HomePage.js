@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { View, StyleSheet, TouchableOpacity, Alert } from "react-native";
-import { HeaderButtons,  } from "react-navigation-header-buttons";
+import { HeaderButtons, } from "react-navigation-header-buttons";
 import CustomHeaderButton, { AddNewGoalButton, } from '../utilities/HeaderButtons';
 import { Button, Card, Provider, Text } from 'react-native-paper';
 import { deleteSpecificGoal, fetchAllGoals } from '../NetworkCalls/networkCalls';
@@ -23,6 +23,7 @@ const HomePage = ({ route, navigation }) => {
     const { authState } = useAuth();
     const { token } = authState;
 
+    console.log("route in homePage",route.params)
     React.useEffect(() => {
         navigation.setOptions({
             headerRight: () => (
@@ -38,12 +39,12 @@ const HomePage = ({ route, navigation }) => {
     })
 
     const fetchGoalsList = () => {
-        console.log("fetchGoalsList")
+        // console.log("fetchGoalsList")
         setSpinner(true);
         fetchAllGoals(token)
             .then((res) => {
                 let result = res.data.data.topics;
-                console.log("result", result);
+                // console.log("result", result);
                 setGoalsList(result);
                 setSpinner(false);
             })
@@ -86,7 +87,7 @@ const HomePage = ({ route, navigation }) => {
         if (token) {
             fetchGoalsList()
         }
-    }, [isScreenFocused,token])
+    }, [isScreenFocused, token])
 
     // const checkLoginStatus = async () => {
     //     const isLoggedIn = await getLoginStatus();
@@ -138,16 +139,17 @@ const CardView = (props) => {
     const [actionType, setActionType] = React.useState("edit");
     const isExpired = end_date.isBefore(moment());
 
-    // console.log("goalData:", goalData?.is_archieved);
+    // console.log("goalData:", isExpired);
 
     return (
         <Provider >
             {editableGoalId !== goalData.id ? (
-                <Card style={[styles.cardContainer, isExpired && styles.expiredCard]}>
+                <Card style={[styles.cardContainer, (isExpired) && styles.expiredCard]}>
                     <TouchableOpacity
                         onPress={() => {
                             props.navigation.navigate("Goal", {
-                                goalData
+                                goalData,
+                                isExpired
                             })
                         }}
                     >
@@ -155,15 +157,15 @@ const CardView = (props) => {
                             <Card.Title title={props.goal.topic_name} style={{ marginRight: "auto" }} />
                         </View>
                         <Card.Content style={styles.cardContent}>
-                            <Text variant="bodyLarge" style={{ marginRight: "auto", color: isExpired && "red" }}>
+                            <Text variant="bodyLarge" style={{ marginRight: "auto", color: (isExpired) && "red" }}>
                                 {end_date.format('DD MMM YYYY')}
                             </Text>
-                            <Text variant="bodyLarge" style={{ marginLeft: "auto", color: isExpired && "red" }}>
-                                {isExpired ? "Deadline Expired" : created_at.fromNow()}
+                            <Text variant="bodyLarge" style={{ marginLeft: "auto", color: (isExpired) && "red" }}>
+                                {(isExpired) ? "Deadline Expired" : created_at.fromNow()}
                             </Text>
                         </Card.Content>
                     </TouchableOpacity>
-                    {(isExpired && !goalData.is_archieved) ? (
+                    {(isExpired) ? (
                         <Card.Actions style={styles.cardFooter}>
                             <Button
                                 style={styles.recreateBtn}
