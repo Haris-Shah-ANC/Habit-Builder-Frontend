@@ -12,6 +12,7 @@ import IndividualGoal, { IndividualGoalScreenOptions } from '../screens/Goals/In
 import { useAuth } from '../screens/Authentication/AuthProvider';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import CustomDrawer from './CustomDrawer';
+import ConnectAccount from '../screens/Authentication/ConnectAccount';
 
 const defaultNavOptions = {
   headerStyle: {
@@ -82,7 +83,7 @@ export const AppNavigator = () => {
           {status === "true" ? (
             <>
               <Stack.Screen name="Home Pages" component={DrawerNavigator} options={{ headerShown: false }} />
-              <Stack.Screen name="All Goals" component={HomePage} />
+              <Stack.Screen name="HomePage" component={HomePage} />
               <Stack.Screen name="Add Goal" component={CreateUpdateGoal} />
               <Stack.Screen name="Goal" component={IndividualGoal} />
             </>
@@ -90,6 +91,7 @@ export const AppNavigator = () => {
             <>
               <Stack.Screen name="Login" component={Login} />
               <Stack.Screen name="Signup" component={Signup} />
+              <Stack.Screen name="ConnectAccount" component={ConnectAccount} />
             </>
           )}
         </Stack.Navigator>

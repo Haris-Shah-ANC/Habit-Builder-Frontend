@@ -49,7 +49,7 @@ const Signup = (props) => {
                     // setUserId(res.data);
                     fillLoginDetails();
                     // clearFormData();
-                    props.navigation.navigate('All Goals');
+                    props.navigation.navigate('HomePage');
                 }
             })
             .catch((err) => {

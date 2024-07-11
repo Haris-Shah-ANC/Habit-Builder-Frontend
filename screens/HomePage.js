@@ -23,7 +23,6 @@ const HomePage = ({ route, navigation }) => {
     const { authState } = useAuth();
     const { token } = authState;
 
-    console.log("route in homePage",route.params)
     React.useEffect(() => {
         navigation.setOptions({
             headerRight: () => (

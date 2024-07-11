@@ -24,3 +24,15 @@ export const loginUser = (userData) => {
             })
     })
 }
+
+export const googleLoginUser = (payloadData) => {
+    return new Promise((resolve, reject) => {
+        axios.post(`${HOST}/dj-rest-auth/google/login/`, payloadData)
+            .then((res) => {
+                resolve(res);
+            })
+            .catch((err) => {
+                reject(err);
+            })
+    })
+}

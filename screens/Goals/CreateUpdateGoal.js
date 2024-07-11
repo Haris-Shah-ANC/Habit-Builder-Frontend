@@ -69,7 +69,7 @@ const CreateUpdateGoal = ({ navigation }) => {
                         }
                     ]);
                 }
-                navigation.navigate("All Goals");
+                navigation.navigate("HomePage");
             })
             .catch((err) => {
                 console.log("Error while creating Goal", err);
