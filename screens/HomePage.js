@@ -88,20 +88,6 @@ const HomePage = ({ route, navigation }) => {
         }
     }, [isScreenFocused, token])
 
-    // const checkLoginStatus = async () => {
-    //     const isLoggedIn = await getLoginStatus();
-    //     // console.log("loginStatus", isLoggedIn);
-    //     setLoginStatus(isLoggedIn)
-    // }
-
-    // React.useEffect(() => {
-    //     checkLoginStatus()
-    // }, [])
-
-    // if (!loginStatus) return <Login />
-
-    // console.log("GoalList", goalsList.data.topics)
-
     return (
         <>
             {spinner ? (

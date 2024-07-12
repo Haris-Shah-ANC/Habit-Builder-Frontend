@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { Alert, KeyboardAvoidingView, ScrollView, StyleSheet, Text } from "react-native"
 import { Provider, TextInput as PaperTextInput, Button, Card } from "react-native-paper";
-import { signUpUser } from "./authNetworkCalls";
+import { resendValidationEmail, signUpUser } from "./authNetworkCalls";
 import { fillLoginDetails, setLoginStatus, setToken, setUserEmail, setUsername } from "../../config/storageCOnfig,";
 
 
 const Signup = (props) => {
 
-    let [name, setName] = useState("");
-    let [email, setEmail] = useState("");
-    let [password, setPassword] = useState("");
-    let [confirmPassword, setConfirmPassword] = useState("");
+    let [name, setName] = useState("Harish");
+    let [email, setEmail] = useState("shakeelahmad9867@gmail.com");
+    let [password, setPassword] = useState("haris123");
+    let [confirmPassword, setConfirmPassword] = useState("haris123");
 
     const clearFormData = () => {
         setName("");
@@ -19,38 +19,74 @@ const Signup = (props) => {
         setConfirmPassword("");
     }
 
+    const resendEmail = () => {
+        console.log("resendEmail")
+        const payloadData = { email: email }
+        resendValidationEmail(payloadData)
+            .then((res) => {
+                console.log("res", res.data)
+            })
+            .catch((err) => {
+                console.log("Error while Resending Email", err.response.data)
+            })
+    }
+
     const onSubmitHandler = () => {
+        if (!name && !email && !password && !confirmPassword) {
+            alert("Please fill all the details for adding Task")
+            return
+        }
+        else if (password !== confirmPassword) {
+            alert("Password and confrim password do not match")
+            return
+        }
         payloadData = {
-            username: name,
+            username: email,
             email: email,
             password1: password,
             password2: confirmPassword
         }
+        // signUpUser(payloadData)
+        //     .then((res) => {
+        //         console.log("res", res.data)
+        //         if (res.data.success !== true) {
+        //             Alert.alert("SignUp Failed", res.data.status ? res.data.status : "Please try again", [
+        //                 {
+        //                     text: "OK",
+        //                     onPress: () => { },
+        //                 },
+        //             ]);
+        //             //reset all data
+        //             // clearFormData();
+        //             // disable loader 
+        //         } else {
+        //             console.log("Successfully Signed Up!");
+
+        //             setToken(res.data.data.access);
+        //             setLoginStatus("true");
+        //             setUsername(res.data.data.name);
+        //             setUserEmail(res.data.data.email);
+        //             // setUserId(res.data);
+        //             fillLoginDetails();
+        //             // clearFormData();
+        //             props.navigation.navigate('HomePage');
+        //         }
+        //     })
+        //     .catch((err) => {
+        //         Alert.alert("SignUp Failed", "Please try again", [
+        //             {
+        //                 text: "OK",
+        //                 onPress: () => { },
+        //             },
+        //         ]);
+        //         // reset all fields
+        //         // clearFormData();
+        //         console.log("Error while Signup", err)
+        //     });
+
         signUpUser(payloadData)
             .then((res) => {
                 console.log("res", res.data)
-                if (res.data.success !== true) {
-                    Alert.alert("SignUp Failed", res.data.status ? res.data.status : "Please try again", [
-                        {
-                            text: "OK",
-                            onPress: () => { },
-                        },
-                    ]);
-                    //reset all data
-                    // clearFormData();
-                    // disable loader 
-                } else {
-                    console.log("Successfully Signed Up!");
-
-                    setToken(res.data.data.access);
-                    setLoginStatus("true");
-                    setUsername(res.data.data.name);
-                    setUserEmail(res.data.data.email);
-                    // setUserId(res.data);
-                    fillLoginDetails();
-                    // clearFormData();
-                    props.navigation.navigate('HomePage');
-                }
             })
             .catch((err) => {
                 Alert.alert("SignUp Failed", "Please try again", [
@@ -59,10 +95,8 @@ const Signup = (props) => {
                         onPress: () => { },
                     },
                 ]);
-                // reset all fields
-                // clearFormData();
-                console.log("Error while Signup", err)
-            });
+                console.log("Error while Signup", err.response.data)
+            })
     };
 
     return (
@@ -112,7 +146,11 @@ const Signup = (props) => {
                         </Card.Content>
 
                         <Button mode="contained" style={styles.btnSingup} onPress={onSubmitHandler}>
-                            SIGN UP
+                            Send Mail
+                        </Button>
+
+                        <Button mode="contained" style={styles.btnSingup} onPress={resendEmail}>
+                            Resend Mail
                         </Button>
                     </Card>
                 </ScrollView>

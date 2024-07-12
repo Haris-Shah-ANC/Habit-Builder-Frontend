@@ -13,6 +13,7 @@ import { useAuth } from '../screens/Authentication/AuthProvider';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import CustomDrawer from './CustomDrawer';
 import ConnectAccount from '../screens/Authentication/ConnectAccount';
+import Register from '../screens/Authentication/Register';
 
 const defaultNavOptions = {
   headerStyle: {
@@ -36,6 +37,15 @@ export const AppNavigator = () => {
     screens: {
       "Login": {
         path: `login/`,
+        parse: {
+          token: (token) => token,
+        },
+        stringify: {
+          token: (token) => token,
+        },
+      },
+      "Signup": {
+        path: `email/confirm/`,
         parse: {
           token: (token) => token,
         },
@@ -92,6 +102,7 @@ export const AppNavigator = () => {
               <Stack.Screen name="Login" component={Login} />
               <Stack.Screen name="Signup" component={Signup} />
               <Stack.Screen name="ConnectAccount" component={ConnectAccount} />
+              <Stack.Screen name="Register" component={Register} />
             </>
           )}
         </Stack.Navigator>

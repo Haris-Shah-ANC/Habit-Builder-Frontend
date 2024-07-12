@@ -4,7 +4,7 @@ import { HOST } from "../../config/config";
 import { FlatList, ScrollView } from "react-native-gesture-handler";
 import { useEffect, useState } from "react";
 import { GoogleLogo } from "../../utilities/HeaderButtons";
-import { googleLoginUser, loginUser } from "./authNetworkCalls";
+import { connectSocialAccount, googleLoginUser, loginUser } from "./authNetworkCalls";
 import { fillLoginDetails, setLoginStatus, setToken, setUserEmail, setUserId, setUsername } from "../../config/storageCOnfig,";
 import { useAuth } from "./AuthProvider";
 import { useRoute } from '@react-navigation/native';
@@ -15,9 +15,10 @@ const Login = (props) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [spinner, setSpinner] = useState(false);
-
-    const { setAuthState, fillLoginDetails } = useAuth();
     const route = useRoute();
+
+    const { setAuthState, fillLoginDetails, authState } = useAuth();
+    const { token } = authState;
 
     const clearFromData = () => {
         setEmail("");
@@ -41,63 +42,106 @@ const Login = (props) => {
     };
 
     useEffect(() => {
-        console.log("token", props.route.params?.token)
+        console.log("token==>", route.path)
         if (route.params?.token) {
             socialLogin(route.params.token);
         }
     }, [route.params?.token]);
 
-    const socialLogin = (token) => {
+    const socialLogin = (code) => {
         setSpinner(true);
         const payloadData = {
             access_token: "",
-            code: token,
+            code: code,
             id_token: ""
         }
         console.log("payloadData", payloadData);
 
-        googleLoginUser(payloadData)
-            .then((res) => {
-                console.log("res", res.data)
-                if (!res.data.access) {
-                    console.log("Google Login Failed");
-                    Alert.alert("Login Failed", res.data.status ? res.data.status : "Please try again", [
-                        {
-                            text: "OK",
-                            onPress: () => { },
-                        },
-                    ]);
-                    setSpinner(false);
-                    // clearFormData();
-                } else {
-                    console.log("Successfully Logged in using Google");
+        // if token exists connect users Social Account else login using callback URL code
+        if (token) {
+            connectSocialAccount(payloadData, token)
+                .then((res) => {
+                    console.log("res", res.data)
+                    if (!res.data.access) {
+                        console.log("Google Login Failed");
+                        Alert.alert("Login Failed", res.data.status ? res.data.status : "Please try again", [
+                            {
+                                text: "OK",
+                                onPress: () => { },
+                            },
+                        ]);
+                        setSpinner(false);
+                    } else {
+                        console.log("Successfully Logged in using Google");
 
-                    setToken(res.data.access);
-                    setAuthState({
-                        token: res.data.access,
-                        status: 'true',
-                        username: res.data.user.first_name,
-                        email: res.data.user.email,
-                        userId: res.data.user.pk
-                    })
+                        setToken(res.data.access);
+                        setLoginStatus("true");
+                        setAuthState({
+                            token: res.data.access,
+                            status: 'true',
+                            username: res.data.user.first_name,
+                            email: res.data.user.email,
+                            userId: res.data.user.pk
+                        })
+                        setSpinner(false);
+                        Alert.alert("Login Failed", "Please try again", [
+                            {
+                                text: "OK",
+                                onPress: () => { },
+                            },
+                        ]);
+                    }
+                })
+                .catch((err) => {
                     setSpinner(false);
-                }
-            })
-            .catch((err) => {
-                setSpinner(false);
-                console.log("Error occured while Google Signin", err);
-                if (err.response?.status === 400) {
-                    props.navigation.navigate('ConnectAccount');
-                }
-                else {
-                    Alert.alert("Login Failed", "Please try again", [
-                        {
-                            text: "OK",
-                            onPress: () => { },
-                        },
-                    ]);
-                }
-            })
+                })
+        } else {
+            console.log("googleLoginUser")
+            googleLoginUser(payloadData)
+                .then((res) => {
+                    console.log("res", res.data)
+                    if (!res.data.access) {
+                        console.log("Google Login Failed");
+                        Alert.alert("Login Failed", res.data.status ? res.data.status : "Please try again", [
+                            {
+                                text: "OK",
+                                onPress: () => { },
+                            },
+                        ]);
+                        setSpinner(false);
+                        // clearFormData();
+                    } else {
+                        console.log("Successfully Logged in using Google");
+
+                        setToken(res.data.access);
+                        setLoginStatus("true");
+                        setAuthState({
+                            token: res.data.access,
+                            status: 'true',
+                            username: res.data.user.first_name,
+                            email: res.data.user.email,
+                            userId: res.data.user.pk
+                        })
+                        setSpinner(false);
+                    }
+                })
+                .catch((err) => {
+                    setSpinner(false);
+                    console.log("Error occured while Google Signin", err);
+                    // status code 400 indicates user email already exist so navigate to social connect page
+                    if (err.response?.status === 400) {
+                        props.navigation.navigate('ConnectAccount');
+                    }
+                    else {
+                        Alert.alert("Login Failed", "Please try again", [
+                            {
+                                text: "OK",
+                                onPress: () => { },
+                            },
+                        ]);
+                    }
+                })
+        }
     }
 
 
@@ -126,7 +170,7 @@ const Login = (props) => {
                     console.log("Successfully Logged in!");
 
                     setToken(res.data.access);
-                    // setLoginStatus("true");
+                    setLoginStatus("true");
                     // setUsername(res.data.user.first_name);
                     // setUserEmail(res.data.user.email);
                     // setUserId(res.data.user.pk);
@@ -197,7 +241,7 @@ const Login = (props) => {
 
                                 <TouchableOpacity
                                     onPress={() => {
-                                        props.navigation.navigate("Signup")
+                                        props.navigation.navigate("Register")
                                     }}
                                 >
                                     <Text style={[styles.signUp, styles.widthStyle]}>
@@ -241,7 +285,7 @@ const styles = StyleSheet.create({
     },
     header: {
         fontSize: 24,
-        fontWeight: 'bold',
+        fontWeight: 'heavy',
         marginBottom: 20,
         textAlign: 'center',
     },

@@ -22,20 +22,26 @@ export const createGoal = async (payloadData) => {
 }
 
 export const fetchAllGoals = async () => {
+    const startTime = Date.now();
+    console.log('Starting fetchAllGoals');
 
     let token = await fetchToken();
     // console.log("fetchAllGoals", token)
-    return new Promise((resolve, reject) => {
+    console.log(`Token fetched in ${Date.now() - startTime}ms`);
 
+    return new Promise((resolve, reject) => {
+        console.log(`Starting API call at ${Date.now() - startTime}ms`);
         axios.get(`${HOST}/userplans/`, {
             headers: {
                 "Authorization": `Bearer ${token}`
             }
         })
             .then((res) => {
+                console.log(`API call completed in ${Date.now() - startTime}ms`);
                 resolve(res);
             })
             .catch((err) => {
+                console.error(`API call failed after ${Date.now() - startTime}ms:`, err);
                 reject(err);
             })
     })

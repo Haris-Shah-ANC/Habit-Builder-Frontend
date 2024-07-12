@@ -36,3 +36,34 @@ export const googleLoginUser = (payloadData) => {
             })
     })
 }
+
+export const connectSocialAccount = (payloadData, token) => {
+
+    return new Promise((resolve, reject) => {
+        axios.post(`${HOST}/google/connect/`, payloadData,
+            {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+            .then((res) => {
+                resolve(res);
+            })
+            .catch((err) => {
+                reject(err);
+            })
+    })
+}
+
+export const resendValidationEmail = (payloadData) => {
+
+    return new Promise((resolve, reject) => {
+        axios.post(`${HOST}/register/resend-email/`, payloadData)
+            .then((res) => {
+                resolve(res);
+            })
+            .catch((err) => {
+                reject(err);
+            })
+    })
+}

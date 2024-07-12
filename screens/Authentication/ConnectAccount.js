@@ -45,7 +45,6 @@ const ConnectAccount = () => {
                         token: res.data.access,
                     })
                     Linking.openURL(`${HOST}/google-login/`);
-
                 }
             })
             .catch((err) => {
@@ -60,23 +59,13 @@ const ConnectAccount = () => {
 
     };
 
-    useEffect(() => {
-        console.log("token", route.params?.token)
-        if (route.params?.token) {
-            socialLogin(route.params.token);
-        }
-    }, [route.params?.token]);
-
-    const socialLogin = (token) => {
-        console.log("token", token)
-    }
 
     return (
         <Provider>
             <KeyboardAvoidingView style={styles.container}>
-                <View style={{ marginHorizontal: 16, flexDirection: 'row', borderRadius: 5, borderWidth: 1, backgroundColor: "#34aadc", borderColor: "#3498db", marginVertical: 13 }}>
+                <View style={styles.connnectInfoContainer}>
                     <Ionicons name="information-circle-outline" size={16} style={{ marginTop: 10 }} />
-                    <Text style={{ flex: 1, paddingVertical: 10, paddingHorizontal: 5, fontSize: 12 }}>
+                    <Text style={styles.connectInfoText}>
                         {` We've found an existing account with the email address associated with your social account.\n\n To link the two accounts,please login with the email and password associated with your existing account.`}
                     </Text>
                 </View>
@@ -162,4 +151,19 @@ const styles = StyleSheet.create({
         width: "80%",
         maxWidth: 390,
     },
+    connnectInfoContainer: {
+        marginHorizontal: 16,
+        flexDirection: 'row',
+        borderRadius: 5,
+        borderWidth: 1,
+        backgroundColor: "#34aadc",
+        borderColor: "#3498db",
+        marginVertical: 13
+    },
+    connectInfoText: {
+        flex: 1,
+        paddingVertical: 10,
+        paddingHorizontal: 5,
+        fontSize: 12
+    }
 })
