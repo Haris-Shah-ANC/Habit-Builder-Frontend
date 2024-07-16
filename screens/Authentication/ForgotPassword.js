@@ -1,10 +1,9 @@
 import React, { useState } from 'react'
-import { StyleSheet, Text, TouchableOpacity, View, ToastAndroid, Alert } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { TextInput, Provider, Button } from 'react-native-paper'
-import { sendVerificationEmail } from './authNetworkCalls';
+import { sendResetPasswordEmail } from './authNetworkCalls';
 
-const Register = (props) => {
-
+const ForgotPassword = () => {
     const [email, setEmail] = useState("");
 
     const sendMail = () => {
@@ -16,22 +15,12 @@ const Register = (props) => {
         }
         // TODO : replace the payload and code according to actual response
         const payloadData = {
-            email: email,
-            send_type: "normal"
+            email: email
         }
-        sendVerificationEmail(payloadData)
+        sendResetPasswordEmail(payloadData)
             .then((res) => {
-                console.log("res", res.data.status);
-                if (res.data.success !== true) {
-                    ToastAndroid.show(res.data.status, ToastAndroid.SHORT);
-                } else {
-                    Alert.alert("Success", res.data.message ? res.data.message.status : "", [
-                        {
-                            text: "OK",
-                            onPress: () => { },
-                        },
-                    ]);
-                }
+                console.log("res", res.data);
+                // TODO : show alert messages according to the api response
             })
             .catch((err) => {
                 console.log("Error occured while sending email", err);
@@ -42,7 +31,7 @@ const Register = (props) => {
         <Provider>
             <View style={styles.container}>
                 <Text style={styles.header}>
-                    Sing up or Sign in
+                    Forgot Password?
                 </Text>
                 <TextInput
                     style={styles.input}
@@ -54,21 +43,13 @@ const Register = (props) => {
                 <Button mode='contained' style={styles.btn} onPress={sendMail}>
                     Send mail
                 </Button>
-                <TouchableOpacity
-                    onPress={() => {
-                        props.navigation.navigate("Login")
-                    }}
-                >
-                    <Text style={[styles.signInText, styles.widthStyle]}>
-                        Already have an account? Sign in
-                    </Text>
-                </TouchableOpacity>
             </View>
         </Provider>
     )
 }
 
-export default Register
+export default ForgotPassword
+
 
 const styles = StyleSheet.create({
     header: {
@@ -90,9 +71,5 @@ const styles = StyleSheet.create({
         width: "100%",
         marginTop: "10%",
         borderRadius: 5,
-    },
-    signInText: {
-        marginTop: "5%",
-        fontWeight: 'heavy',
     }
 })

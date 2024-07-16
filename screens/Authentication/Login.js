@@ -156,8 +156,8 @@ const Login = (props) => {
         console.log("Login Payload", payloadData)
         loginUser(payloadData)
             .then((res) => {
-                // console.log("res", res.data)
-                if (!res.data.access) {
+                console.log("res", res.data)
+                if (res.data.success !== true) {
                     Alert.alert("Login Failed", res.data.status ? res.data.status : "Please try again", [
                         {
                             text: "OK",
@@ -169,7 +169,7 @@ const Login = (props) => {
                 } else {
                     console.log("Successfully Logged in!");
 
-                    setToken(res.data.access);
+                    setToken(res.data.token.access);
                     setLoginStatus("true");
                     // setUsername(res.data.user.first_name);
                     // setUserEmail(res.data.user.email);
@@ -178,11 +178,11 @@ const Login = (props) => {
                     // clearFromData();
 
                     setAuthState({
-                        token: res.data.access,
+                        token: res.data.token.access,
                         status: 'true',
                         username: res.data.user.first_name,
                         email: res.data.user.email,
-                        userId: res.data.user.pk
+                        userId: res.data.user.id
                     })
                     setSpinner(false);
 
@@ -234,7 +234,15 @@ const Login = (props) => {
                                     mode="outlined"
                                     label="password"
                                 />
-
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        props.navigation.navigate("ForgotPassword")
+                                    }}
+                                >
+                                    <Text style={styles.forgotPassword}>
+                                        FORGOT PASSWORD?
+                                    </Text>
+                                </TouchableOpacity>
                                 <Button mode="contained" style={styles.btnLoginup} onPress={onSubmitHandler}>
                                     Login
                                 </Button>
@@ -315,4 +323,11 @@ const styles = StyleSheet.create({
         width: "80%",
         maxWidth: 390,
     },
+    forgotPassword: {
+        alignSelf: "flex-end",
+        marginBottom: 10,
+        fontSize: 13,
+        color: "#3498db",
+        fontWeight: "bold"
+    }
 })

@@ -67,3 +67,44 @@ export const resendValidationEmail = (payloadData) => {
             })
     })
 }
+
+// TODO : replace with actual endpoint
+export const sendVerificationEmail = (payloadData) => {
+
+    return new Promise((resolve, reject) => {
+        axios.post(`${HOST}/send_verify_registration_mail_view/`, payloadData)
+            .then((res) => {
+                resolve(res);
+            })
+            .catch((err) => {
+                reject(err);
+            })
+    })
+}
+
+export const sendResetPasswordEmail = (payloadData) => {
+
+    return new Promise((resolve, reject) => {
+        axios.post(`${HOST}/password-reset/`, payloadData)
+            .then((res) => {
+                resolve(res);
+            })
+            .catch((err) => {
+                reject(err);
+            })
+    })
+}
+
+// TODO : replace with actual endpoint
+export const resetPassword = () => {
+
+    return new Promise((resolve, reject) => {
+        axios.post(`${HOST}/change-password/`, payloadData)
+            .then((res) => {
+                resolve(res);
+            })
+            .catch((err) => {
+                reject(err);
+            })
+    })
+}

@@ -14,6 +14,8 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import CustomDrawer from './CustomDrawer';
 import ConnectAccount from '../screens/Authentication/ConnectAccount';
 import Register from '../screens/Authentication/Register';
+import ForgotPassword from '../screens/Authentication/ForgotPassword';
+import ResetPassword from '../screens/Authentication/ResetPassword';
 
 const defaultNavOptions = {
   headerStyle: {
@@ -44,8 +46,19 @@ export const AppNavigator = () => {
           token: (token) => token,
         },
       },
+      // TODO : replace the path with actual path
       "Signup": {
-        path: `email/confirm/`,
+        path: `auth/sign-up/`,
+        parse: {
+          token: (token) => token,
+        },
+        stringify: {
+          token: (token) => token,
+        },
+      },
+      // TODO : replace the path with actual path and parsing method to get token and id
+      "ResetPassword": {
+        path: `password/confirm/`,
         parse: {
           token: (token) => token,
         },
@@ -103,6 +116,8 @@ export const AppNavigator = () => {
               <Stack.Screen name="Signup" component={Signup} />
               <Stack.Screen name="ConnectAccount" component={ConnectAccount} />
               <Stack.Screen name="Register" component={Register} />
+              <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+              <Stack.Screen name="ResetPassword" component={ResetPassword} />
             </>
           )}
         </Stack.Navigator>

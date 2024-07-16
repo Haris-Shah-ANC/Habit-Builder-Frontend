@@ -37,7 +37,7 @@ const Signup = (props) => {
             return
         }
         else if (password !== confirmPassword) {
-            alert("Password and confrim password do not match")
+            alert("Password and confirm password do not match")
             return
         }
         payloadData = {

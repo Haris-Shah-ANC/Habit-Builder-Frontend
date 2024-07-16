@@ -132,21 +132,24 @@ const IndividualGoal = (props) => {
 
     return (
         <>
-            {
-                (!showAddNewTaskWindow) ?
+            {!has_deadline_expired ? (
+                (!showAddNewTaskWindow) ? (
                     <Button
                         icon={"plus"}
                         onPress={() => setShowAddNewTaskWindow(true)}
                     >
                         Add New Task
                     </Button>
-                    : (
-                        <AddNewSubGoal
-                            closeOption={(option) => closeWindow(option)}
-                            goalId={goal_id}
-                            udpateSubGoalsList={(data) => setSubGoalsList(data)}
-                        />
-                    )
+                ) : (
+                    <AddNewSubGoal
+                        closeOption={(option) => closeWindow(option)}
+                        goalId={goal_id}
+                        udpateSubGoalsList={(data) => setSubGoalsList(data)}
+                    />
+                )
+            ) : (
+                ""
+            )
             }
             <ScrollView>
                 {subGoalsList.map(subGoal => (
@@ -179,6 +182,8 @@ const IndividualGoal = (props) => {
 const SubGoalView = (props) => {
     const [editableRowId, setEditableRowId] = React.useState(null);
     const [isPickerVisible, setIsPickerVisible] = React.useState(false);
+    const [showDatePicker, setShowDatePicker] = React.useState(false);
+    const [showTimePicker, setShowTimePicker] = React.useState(false);
     const [pickerMode, setPickerMode] = React.useState("date");
     const [datePickerData, setDatePickerData] = React.useState(new Date());
     const [timePickerData, setTimePickerData] = React.useState(new Date());
@@ -192,25 +197,6 @@ const SubGoalView = (props) => {
 
 
     // console.log("Props inside SubGoalView", props.has_deadline_expired)
-
-    const showMode = (currentMode) => {
-        setIsPickerVisible(true);
-        setPickerMode(currentMode);
-    };
-
-    const onPickerValueChange = (event, selectedDate, mode) => {
-        const currentDate = selectedDate || date;
-        // console.log("currentDate", moment(currentDate).format("MMM Do YY"));
-        if (mode === "date") {
-            setDatePickerData(currentDate);
-            setIsPickerVisible(false);
-            return
-        } else {
-            setTimePickerData(currentDate);
-            setIsPickerVisible(false);
-            return
-        }
-    };
 
     return (
         <Provider>
@@ -310,19 +296,42 @@ const SubGoalView = (props) => {
                             <View >
                                 <View style={{ flexDirection: "row", marginTop: "2%" }}>
                                     <Button
-                                        onPress={() => showMode("date")}
+                                        onPress={() => setShowDatePicker(true)}
                                         icon="calendar"
                                     >
                                         {datePickerData.toDateString().slice(0, -5)}
                                     </Button>
+                                    {showDatePicker && (
+                                        <DateTimePicker
+                                            value={datePickerData}
+                                            mode={"date"}
+                                            display="default"
+                                            onChange={(event, selectedDate) => {
+                                                const currentDate = selectedDate || datePickerData;
+                                                setShowDatePicker(false);
+                                                setDatePickerData(currentDate);
+                                            }}
+                                        />
+                                    )}
                                     <Button
                                         style={{ marginLeft: -10 }}
-                                        onPress={() => showMode("time")}
+                                        onPress={() => setShowTimePicker(true)}
                                         icon="clock"
                                     >
                                         {timePickerData.toTimeString().slice(0, -12)}
                                     </Button>
-
+                                    {showTimePicker && (
+                                        <DateTimePicker
+                                            value={timePickerData}
+                                            mode="time"
+                                            display="default"
+                                            onChange={(e, selectedTime) => {
+                                                const currentTime = selectedTime || timePickerData;
+                                                setShowTimePicker(false);
+                                                setTimePickerData(currentTime);
+                                            }}
+                                        />
+                                    )}
                                     <TextInput
                                         style={{ margin: 10, height: 40, width: '30%', backgroundColor: "white", marginTop: "-2%" }}
                                         placeholder="times"
@@ -348,16 +357,6 @@ const SubGoalView = (props) => {
                                         Save
                                     </Button>
                                 </View>
-                                {isPickerVisible && (
-                                    <DateTimePicker
-                                        testID="dateTimePicker"
-                                        value={pickerMode === "date" ? datePickerData : timePickerData}
-                                        mode={pickerMode}
-                                        is24Hour={true}
-                                        display="default"
-                                        onChange={(event, selectedDate) => onPickerValueChange(event, selectedDate, pickerMode)}
-                                    />
-                                )}
                             </View>
                         )}
                         <Divider />
