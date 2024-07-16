@@ -56,11 +56,10 @@ const Signup = (props) => {
             mobile_number: ""
         }
 
-        // console.log("Singup Payload", payloadData);
         setSpinner(true);
         signUpUser(payloadData)
             .then((res) => {
-                console.log("res", res.data)
+                // console.log("res", res.data)
                 if (res.data.success !== true) {
                     Alert.alert("SignUp Failed", res.data.status ? res.data.status : "Please try again", [
                         {
@@ -79,7 +78,7 @@ const Signup = (props) => {
                     setAuthState({
                         token: res.data?.data?.token?.access,
                         status: 'true',
-                        username: `${res.data?.data?.user?.first_name} + ${res.data?.data?.user?.last_name}`,
+                        username: `${res.data?.data?.user?.first_name} ${res.data?.data?.user?.last_name}`,
                         email: res.data?.data?.user?.email,
                         userId: res.data?.data?.user?.id
                     })
@@ -151,7 +150,7 @@ const Signup = (props) => {
                             </Card.Content>
 
                             <Button mode="contained" style={styles.btnSingup} onPress={onSubmitHandler}>
-                                Send Mail
+                                Continue
                             </Button>
 
                             {/* <Button mode="contained" style={styles.btnSingup} onPress={resendEmail}>

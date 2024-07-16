@@ -1,16 +1,14 @@
 import { useRoute } from '@react-navigation/native'
 import React, { useEffect, useState } from 'react'
-import { View, StyleSheet, Text } from 'react-native'
+import { View, StyleSheet, Text, Alert } from 'react-native'
 import { Button, Card, TextInput as PaperTextInput } from 'react-native-paper';
 import { resetPassword } from './authNetworkCalls';
 
-const ResetPassword = () => {
+const ResetPassword = (props) => {
 
+    const [password, setPassword] = useState("H@ris123");
+    const [confirmPassword, setConfirmPassword] = useState("H@ris123");
     const route = useRoute();
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [urlToken, setUrlToken] = useState("");
-    const [urlId, setUrlId] = useState("");
 
     const onSubmitHandler = () => {
         if (password !== confirmPassword) {
@@ -18,28 +16,36 @@ const ResetPassword = () => {
             return
         }
         const payloadData = {
-            url: "URL TOKEN HERE",
-            id: "URL ID HERE",
-            password: password
+            token: route.params?.token,
+            new_password: password
         }
 
         resetPassword(payloadData)
             .then((res) => {
-                console.log("res", res.data);
-                // TODO : on api success navigate to Login Screen
+                // console.log("res", res.data);
+                if (res.data.success !== true) {
+                    Alert.alert("Reset Password Failed!", res.data.status ? res.data.status : "Please try again", [
+                        {
+                            text: "OK",
+                            onPress: () => { },
+                        },
+                    ]);
+                } else {
+                    console.log("Password Updated Successfully!");
+                    Alert.alert("Success!", res.data.status ? res.data.status : "Password Updated Successfully", [
+                        {
+                            text: "OK",
+                            onPress: () => { },
+                        },
+                    ]);
+                    props.navigation.navigate('Login');
+                }
             })
             .catch((err) => {
-                console.log("Error while Resetting Password", res);
+                console.log("Error while Resetting Password", err);
             })
 
     }
-
-    useEffect(() => {
-        // console.log("token==>", route.path)
-        if (route?.params?.token) {
-
-        }
-    }, [route.params?.token]);
 
 
     return (
@@ -82,7 +88,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        alignItems: "center"
+        alignItems: "center",
+        marginVertical: "25%"
     },
     boxContainer: {
         width: "100%",

@@ -1,10 +1,13 @@
 import React, { useState } from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, StyleSheet, Text, ToastAndroid, View } from 'react-native'
 import { TextInput, Provider, Button } from 'react-native-paper'
 import { sendResetPasswordEmail } from './authNetworkCalls';
+import Spinner from '../../utilities/Spinner';
 
 const ForgotPassword = () => {
+
     const [email, setEmail] = useState("");
+    const [spinner, setSpinner] = useState(false);
 
     const sendMail = () => {
         const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
@@ -13,16 +16,32 @@ const ForgotPassword = () => {
             alert("Please enter a valid email")
             return
         }
-        // TODO : replace the payload and code according to actual response
+
         const payloadData = {
-            email: email
+            email: email,
+            send_type: "normal"
         }
+
+        setSpinner(true);
         sendResetPasswordEmail(payloadData)
             .then((res) => {
-                console.log("res", res.data);
-                // TODO : show alert messages according to the api response
+                // console.log("res", res.data);
+                setSpinner(false);
+                if (res.data.success !== true) {
+                    ToastAndroid.show(res.data.status, ToastAndroid.SHORT);
+                } else {
+                    setSpinner(false);
+                    setEmail("");
+                    Alert.alert("Success", res.data.message ? res.data.message.status : "", [
+                        {
+                            text: "OK",
+                            onPress: () => { },
+                        },
+                    ]);
+                }
             })
             .catch((err) => {
+                setSpinner(false);
                 console.log("Error occured while sending email", err);
             })
     }
@@ -30,6 +49,9 @@ const ForgotPassword = () => {
     return (
         <Provider>
             <View style={styles.container}>
+                <View style={spinner ? [styles.modalStyle] : [{ display: "none" }]}>
+                    <Spinner />
+                </View>
                 <Text style={styles.header}>
                     Forgot Password?
                 </Text>
@@ -71,5 +93,16 @@ const styles = StyleSheet.create({
         width: "100%",
         marginTop: "10%",
         borderRadius: 5,
-    }
+    },
+    modalStyle: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        opacity: 0.6,
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+        backgroundColor: "white",
+        zIndex: 1,
+    },
 })

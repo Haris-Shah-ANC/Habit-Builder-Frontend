@@ -69,7 +69,6 @@ export const resendValidationEmail = (payloadData) => {
     })
 }
 
-// TODO : replace with actual endpoint
 export const sendVerificationEmail = (payloadData) => {
 
     return new Promise((resolve, reject) => {
@@ -86,7 +85,7 @@ export const sendVerificationEmail = (payloadData) => {
 export const sendResetPasswordEmail = (payloadData) => {
 
     return new Promise((resolve, reject) => {
-        axios.post(`${HOST}/password-reset/`, payloadData)
+        axios.post(`${HOST}/send-reset-password-mail/`, payloadData)
             .then((res) => {
                 resolve(res);
             })
@@ -96,11 +95,10 @@ export const sendResetPasswordEmail = (payloadData) => {
     })
 }
 
-// TODO : replace with actual endpoint
-export const resetPassword = () => {
+export const resetPassword = (payloadData) => {
 
     return new Promise((resolve, reject) => {
-        axios.post(`${HOST}/change-password/`, payloadData)
+        axios.post(`${HOST}/reset-password/`, payloadData)
             .then((res) => {
                 resolve(res);
             })

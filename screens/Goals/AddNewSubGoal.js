@@ -107,7 +107,6 @@ export const AddNewSubGoal = (props) => {
             system_defined_unit: isUnitSystemDefined ? value : null
         }
 
-        // console.log("payloadData", payloadData);
 
         if (action === "edit") {
             updateSubGoal(payloadData, subGoalId)

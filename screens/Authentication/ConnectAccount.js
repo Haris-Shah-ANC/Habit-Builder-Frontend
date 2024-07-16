@@ -28,7 +28,7 @@ const ConnectAccount = () => {
             email: email,
             password: password
         }
-        console.log("Login Payload", payloadData)
+        // console.log("Login Payload", payloadData)
         loginUser(payloadData)
             .then((res) => {
                 if (res.data.success !== true) {
@@ -112,7 +112,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        alignItems: "center"
+        alignItems: "center",
+        marginVertical: "25%"
     },
     boxContainer: {
         width: "100%",

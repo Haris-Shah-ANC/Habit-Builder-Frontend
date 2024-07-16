@@ -57,7 +57,7 @@ const EditRecreateGoal = (props) => {
             tasks: props.goalData.tasks
         }
 
-        console.log("payloadData:", payloadData);
+        // console.log("payloadData:", payloadData);
         recreateGoalNewTimeline(payloadData)
             .then((res) => {
                 let result = res.data;

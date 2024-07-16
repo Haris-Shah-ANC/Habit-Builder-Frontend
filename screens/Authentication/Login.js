@@ -42,7 +42,7 @@ const Login = (props) => {
     };
 
     useEffect(() => {
-        console.log("token==>", route.path)
+        // console.log("token==>", route.path)
         if (route.params?.token) {
             socialLogin(route.params.token);
         }
@@ -55,14 +55,14 @@ const Login = (props) => {
             code: code,
             id_token: ""
         }
-        console.log("payloadData", payloadData);
+        // console.log("payloadData", payloadData);
 
         // if token exists connect users Social Account else login using callback URL code
         if (token) {
             console.log("connecting Social Accounts")
             connectSocialAccount(payloadData, token)
                 .then((res) => {
-                    console.log("res", res.data)
+                    // console.log("res", res.data)
                     if (!res.data.access) {
                         console.log("Google Login Failed");
                         Alert.alert("Login Failed", res.data.status ? res.data.status : "Please try again", [
@@ -85,12 +85,6 @@ const Login = (props) => {
                             userId: res.data.user.pk
                         })
                         setSpinner(false);
-                        // Alert.alert("Login Failed", "Please try again", [
-                        //     {
-                        //         text: "OK",
-                        //         onPress: () => { },
-                        //     },
-                        // ]);
                     }
                 })
                 .catch((err) => {
@@ -100,7 +94,7 @@ const Login = (props) => {
             console.log("googleLoginUser")
             googleLoginUser(payloadData)
                 .then((res) => {
-                    console.log("res", res.data)
+                    // console.log("google login res", res.data)
                     if (!res.data.access) {
                         console.log("Google Login Failed");
                         Alert.alert("Login Failed", res.data.status ? res.data.status : "Please try again", [
@@ -148,16 +142,14 @@ const Login = (props) => {
 
     const onSubmitHandler = () => {
         setSpinner(true);
-        console.log("onSubmitHandler")
         let payloadData = {
             username: email,
             email: email,
             password: password
         }
-        console.log("Login Payload", payloadData)
         loginUser(payloadData)
             .then((res) => {
-                console.log("res", res.data)
+                // console.log("res", res.data)
                 if (res.data.success !== true) {
                     Alert.alert("Login Failed", res.data.status ? res.data.status : "Please try again", [
                         {
@@ -181,7 +173,7 @@ const Login = (props) => {
                     setAuthState({
                         token: res.data.token.access,
                         status: 'true',
-                        username: `${res.data.user.first_name} + ${res.data.user.last_name}`,
+                        username: `${res.data.user.first_name} ${res.data.user.last_name}`,
                         email: res.data.user.email,
                         userId: res.data.user.id
                     })

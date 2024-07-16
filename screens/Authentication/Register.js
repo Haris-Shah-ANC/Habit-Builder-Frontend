@@ -23,7 +23,7 @@ const Register = (props) => {
         setSpinner(true);
         sendVerificationEmail(payloadData)
             .then((res) => {
-                console.log("res", res.data);
+                // console.log("res", res.data);
                 setSpinner(false);
                 if (res.data.success !== true) {
                     ToastAndroid.show(res.data.status, ToastAndroid.SHORT);

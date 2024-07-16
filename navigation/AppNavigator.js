@@ -56,9 +56,8 @@ export const AppNavigator = () => {
           token: (token) => token,
         },
       },
-      // TODO : replace the path with actual path and parsing method to get token and id
       "ResetPassword": {
-        path: `password/confirm/`,
+        path: `reset-password/`,
         parse: {
           token: (token) => token,
         },
@@ -114,10 +113,10 @@ export const AppNavigator = () => {
             <>
               <Stack.Screen name="Login" component={Login} />
               <Stack.Screen name="Signup" component={Signup} />
-              <Stack.Screen name="ConnectAccount" component={ConnectAccount} />
+              <Stack.Screen name="ConnectAccount" component={ConnectAccount} options={{ headerShown: false }}/>
               <Stack.Screen name="Register" component={Register} />
               <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
-              <Stack.Screen name="ResetPassword" component={ResetPassword} />
+              <Stack.Screen name="ResetPassword" component={ResetPassword} options={{ headerShown: false }}/>
             </>
           )}
         </Stack.Navigator>
