@@ -1,39 +1,43 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, KeyboardAvoidingView, ScrollView, StyleSheet, Text } from "react-native"
 import { Provider, TextInput as PaperTextInput, Button, Card } from "react-native-paper";
 import { resendValidationEmail, signUpUser } from "./authNetworkCalls";
 import { fillLoginDetails, setLoginStatus, setToken, setUserEmail, setUsername } from "../../config/storageCOnfig,";
-
+import { useRoute } from "@react-navigation/native";
+import Spinner from "../../utilities/Spinner";
+import { useAuth } from "./AuthProvider";
 
 const Signup = (props) => {
 
-    let [name, setName] = useState("Harish");
-    let [email, setEmail] = useState("shakeelahmad9867@gmail.com");
-    let [password, setPassword] = useState("haris123");
-    let [confirmPassword, setConfirmPassword] = useState("haris123");
+    const [spinner, setSpinner] = useState(false);
+    let [firstName, setFirstName] = useState("");
+    let [lastName, setLastName] = useState("");
+    let [password, setPassword] = useState("");
+    let [confirmPassword, setConfirmPassword] = useState("");
+    const route = useRoute();
+
+    const { setAuthState } = useAuth();
 
     const clearFormData = () => {
         setName("");
-        setEmail("");
         setPassword("");
         setConfirmPassword("");
     }
 
-    const resendEmail = () => {
-        console.log("resendEmail")
-        const payloadData = { email: email }
-        resendValidationEmail(payloadData)
-            .then((res) => {
-                console.log("res", res.data)
-            })
-            .catch((err) => {
-                console.log("Error while Resending Email", err.response.data)
-            })
-    }
+    // const resendEmail = () => {
+    //     const payloadData = { email: email }
+    //     resendValidationEmail(payloadData)
+    //         .then((res) => {
+    //             console.log("res", res.data)
+    //         })
+    //         .catch((err) => {
+    //             console.log("Error while Resending Email", err.response.data)
+    //         })
+    // }
 
     const onSubmitHandler = () => {
-        if (!name && !email && !password && !confirmPassword) {
-            alert("Please fill all the details for adding Task")
+        if (!firstName && !lastName && !password && !confirmPassword) {
+            alert("Please fill all the required details for adding Task")
             return
         }
         else if (password !== confirmPassword) {
@@ -41,120 +45,122 @@ const Signup = (props) => {
             return
         }
         payloadData = {
-            username: email,
-            email: email,
-            password1: password,
-            password2: confirmPassword
+            token: route.params?.token,
+            password: password,
+            firt_name: firstName,
+            last_name: lastName,
+            date_of_birth: null,
+            gender: "",
+            city: "",
+            zip_code: "",
+            mobile_number: ""
         }
-        // signUpUser(payloadData)
-        //     .then((res) => {
-        //         console.log("res", res.data)
-        //         if (res.data.success !== true) {
-        //             Alert.alert("SignUp Failed", res.data.status ? res.data.status : "Please try again", [
-        //                 {
-        //                     text: "OK",
-        //                     onPress: () => { },
-        //                 },
-        //             ]);
-        //             //reset all data
-        //             // clearFormData();
-        //             // disable loader 
-        //         } else {
-        //             console.log("Successfully Signed Up!");
 
-        //             setToken(res.data.data.access);
-        //             setLoginStatus("true");
-        //             setUsername(res.data.data.name);
-        //             setUserEmail(res.data.data.email);
-        //             // setUserId(res.data);
-        //             fillLoginDetails();
-        //             // clearFormData();
-        //             props.navigation.navigate('HomePage');
-        //         }
-        //     })
-        //     .catch((err) => {
-        //         Alert.alert("SignUp Failed", "Please try again", [
-        //             {
-        //                 text: "OK",
-        //                 onPress: () => { },
-        //             },
-        //         ]);
-        //         // reset all fields
-        //         // clearFormData();
-        //         console.log("Error while Signup", err)
-        //     });
-
+        // console.log("Singup Payload", payloadData);
+        setSpinner(true);
         signUpUser(payloadData)
             .then((res) => {
                 console.log("res", res.data)
+                if (res.data.success !== true) {
+                    Alert.alert("SignUp Failed", res.data.status ? res.data.status : "Please try again", [
+                        {
+                            text: "OK",
+                            onPress: () => { },
+                        },
+                    ]);
+                    setSpinner(false);
+                    // clearFormData();
+                } else {
+                    console.log("Successfully Signed Up!");
+
+                    setToken(res.data?.data?.token?.access);
+                    setLoginStatus("true");
+
+                    setAuthState({
+                        token: res.data?.data?.token?.access,
+                        status: 'true',
+                        username: `${res.data?.data?.user?.first_name} + ${res.data?.data?.user?.last_name}`,
+                        email: res.data?.data?.user?.email,
+                        userId: res.data?.data?.user?.id
+                    })
+                    setSpinner(false);
+                    // clearFormData();
+                }
             })
             .catch((err) => {
+                setSpinner(false);
                 Alert.alert("SignUp Failed", "Please try again", [
                     {
                         text: "OK",
                         onPress: () => { },
                     },
                 ]);
-                console.log("Error while Signup", err.response.data)
-            })
+                // clearFormData();
+                console.log("Error while Signup", err)
+            });
     };
 
     return (
         <Provider>
-            <KeyboardAvoidingView style={styles.container}>
-                <Text style={styles.header}>Signup</Text>
-                <ScrollView
-                    style={styles.boxContainer}
-                    showsHorizontalScrollIndicator={false}
-                    showsVerticalScrollIndicator={false}
-                >
-                    <Card style={styles.card}>
-                        <Card.Content>
-                            <PaperTextInput
-                                style={styles.input}
-                                value={name}
-                                onChangeText={setName}
-                                mode="outlined"
-                                label="Name"
-                            />
+            {spinner ? (
+                <Spinner />
+            ) : (
+                <KeyboardAvoidingView style={styles.container}>
+                    <Text style={styles.header}>Signup</Text>
+                    <ScrollView
+                        style={styles.boxContainer}
+                        showsHorizontalScrollIndicator={false}
+                        showsVerticalScrollIndicator={false}
+                    >
+                        <Card style={styles.card}>
+                            <Card.Content>
+                                <PaperTextInput
+                                    style={styles.input}
+                                    value={firstName}
+                                    onChangeText={setFirstName}
+                                    mode="outlined"
+                                    label="First Name"
+                                />
 
-                            <PaperTextInput
-                                style={styles.input}
-                                value={email}
-                                onChangeText={setEmail}
-                                mode="outlined"
-                                label="email"
-                            />
+                                <PaperTextInput
+                                    style={styles.input}
+                                    value={lastName}
+                                    onChangeText={setLastName}
+                                    mode="outlined"
+                                    label="Last Name"
+                                />
 
-                            <PaperTextInput
-                                style={styles.input}
-                                value={password}
-                                secureTextEntry
-                                onChangeText={setPassword}
-                                mode="outlined"
-                                label="password"
-                            />
+                                <PaperTextInput
+                                    style={styles.input}
+                                    value={password}
+                                    secureTextEntry
+                                    onChangeText={setPassword}
+                                    mode="outlined"
+                                    label="password"
+                                />
 
-                            <PaperTextInput
-                                style={styles.input}
-                                value={confirmPassword}
-                                secureTextEntry
-                                onChangeText={setConfirmPassword}
-                                mode="outlined"
-                                label="confirm password"
-                            />
-                        </Card.Content>
+                                <PaperTextInput
+                                    style={styles.input}
+                                    value={confirmPassword}
+                                    secureTextEntry
+                                    onChangeText={setConfirmPassword}
+                                    mode="outlined"
+                                    label="confirm password"
+                                />
 
-                        <Button mode="contained" style={styles.btnSingup} onPress={onSubmitHandler}>
-                            Send Mail
-                        </Button>
+                            </Card.Content>
 
-                        <Button mode="contained" style={styles.btnSingup} onPress={resendEmail}>
+                            <Button mode="contained" style={styles.btnSingup} onPress={onSubmitHandler}>
+                                Send Mail
+                            </Button>
+
+                            {/* <Button mode="contained" style={styles.btnSingup} onPress={resendEmail}>
                             Resend Mail
-                        </Button>
-                    </Card>
-                </ScrollView>
-            </KeyboardAvoidingView>
+                        </Button> */}
+                        </Card>
+                    </ScrollView>
+                </KeyboardAvoidingView>
+            )}
         </Provider>
     )
 }

@@ -31,18 +31,17 @@ const ConnectAccount = () => {
         console.log("Login Payload", payloadData)
         loginUser(payloadData)
             .then((res) => {
-                if (!res.data.access) {
+                if (res.data.success !== true) {
                     Alert.alert("Login Failed", res.data.status ? res.data.status : "Please try again", [
                         {
                             text: "OK",
                             onPress: () => { },
                         },
                     ]);
-                    setSpinner(false);
                     // clearFormData();
                 } else {
                     setAuthState({
-                        token: res.data.access,
+                        token: res.data.token.access,
                     })
                     Linking.openURL(`${HOST}/google-login/`);
                 }
