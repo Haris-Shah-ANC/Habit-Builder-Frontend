@@ -6,8 +6,8 @@ import { resetPassword } from './authNetworkCalls';
 
 const ResetPassword = (props) => {
 
-    const [password, setPassword] = useState("H@ris123");
-    const [confirmPassword, setConfirmPassword] = useState("H@ris123");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     const route = useRoute();
 
     const onSubmitHandler = () => {
